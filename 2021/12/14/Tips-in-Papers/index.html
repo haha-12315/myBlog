@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 6.0.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/ye_32.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/ye_16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.8.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="记录阅读论文过程中，新获取的信息。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tips in Papers">
+<meta property="og:url" content="http://example.com/2021/12/14/Tips-in-Papers/index.html">
+<meta property="og:site_name" content="Ye, Xiang&#39;s Blog">
+<meta property="og:description" content="记录阅读论文过程中，新获取的信息。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_Over.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_Cell.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_eq1.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_eq2.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_eq3.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_gl.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/Tnet_over.jpg">
+<meta property="og:image" content="http://example.com/2021/12/14/Tips-in-Papers/ADCM.jpg">
+<meta property="article:published_time" content="2021-12-14T08:33:03.000Z">
+<meta property="article:modified_time" content="2022-01-05T09:11:51.293Z">
+<meta property="article:author" content="Xiang Ye">
+<meta property="article:tag" content="Personal Thought">
+<meta property="article:tag" content="Papers">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2021/12/14/Tips-in-Papers/Saccader_Over.jpg">
+
+
+<link rel="canonical" href="http://example.com/2021/12/14/Tips-in-Papers/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2021/12/14/Tips-in-Papers/","path":"2021/12/14/Tips-in-Papers/","title":"Tips in Papers"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Tips in Papers | Ye, Xiang's Blog</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Ye, Xiang's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Hard-Attention"><span class="nav-text">1. Hard Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2019-Scacader-Improving-Accuracy-of-Hard-Attention-Models-for-Vision"><span class="nav-text">1.1. 2019 Scacader: Improving Accuracy of Hard Attention Models for Vision</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hard-Attention%E9%80%89%E6%8B%A9%E7%9B%B8%E5%85%B3%E7%9A%84%E7%89%B9%E5%BE%81%E4%BD%9C%E4%B8%BA%E8%BE%93%E5%85%A5%EF%BC%8C%E6%98%AF%E7%9C%9F%E6%AD%A3%E5%85%B7%E6%9C%89%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%E7%9A%84%E3%80%82%E4%BB%8E%E4%B8%8B%E9%9D%A2%E7%AC%AC%E4%B8%80%E6%AE%B5%E8%AF%9D%EF%BC%8C%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%87%BA%EF%BC%8Chard-attention%E6%98%AF%E7%9C%9F%E6%AD%A3%E5%92%8C%E6%80%A7%E8%83%BD%E6%8C%82%E9%92%A9%E7%9A%84%E3%80%82%E4%B9%9F%E4%B8%80%E5%AE%9A%E5%92%8C%E7%89%B9%E5%BE%81%E9%87%8D%E8%A6%81%E6%80%A7%E6%98%AF%E5%90%BB%E5%90%88%E7%9A%84%E3%80%82%E4%BD%86%E6%98%AFSoft-Attention%E4%B8%8D%E5%85%B7%E6%9C%89%E5%8F%AF%E8%A7%A3%E9%87%8A%E6%80%A7%EF%BC%8C%E5%B0%8F%E6%9D%83%E9%87%8D%E7%9A%84%E7%89%B9%E5%BE%81%E5%B9%B6%E4%B8%8D%E4%B8%80%E5%AE%9A%E4%B8%8D%E9%87%8D%E8%A6%81"><span class="nav-text">1.1.1. Hard Attention选择相关的特征作为输入，是真正具有可解释性的。从下面第一段话，可以看出，hard attention是真正和性能挂钩的。也一定和特征重要性是吻合的。但是Soft Attention不具有可解释性，小权重的特征并不一定不重要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%B8%ADglimpse%E7%9A%84%E5%90%AB%E4%B9%89%EF%BC%8C%E5%8F%AF%E4%BB%A5%E7%90%86%E8%A7%A3%E6%88%90%E6%AF%8F%E4%B8%80%E4%B8%AA%E4%BD%8D%E7%BD%AE%EF%BC%8C%E5%8D%B3%E6%AF%8F%E4%B8%80%E4%B8%AApatch%EF%BC%8C%E5%B0%B1%E6%98%AF%E4%B8%80%E4%B8%AAglimpse%E3%80%82"><span class="nav-text">1.1.2. 文中glimpse的含义，可以理解成每一个位置，即每一个patch，就是一个glimpse。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E7%AB%A0%E6%8F%90%E5%87%BA%E4%BA%86Hard-Attention%E4%B8%8E%E5%8F%8C%E9%98%B6%E6%AE%B5%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95%E7%9A%84%E7%9B%B8%E4%BC%BC%E6%80%A7%E3%80%82%E4%BB%96%E4%BB%AC%E9%83%BD%E6%98%AF%E6%88%AA%E5%8F%96%E5%9B%BE%E5%83%8F%E5%9D%97%E4%BD%9C%E4%B8%BA%E8%BE%93%E5%85%A5%EF%BC%8C%E7%84%B6%E5%90%8E%E8%BF%9B%E8%A1%8C%E5%88%86%E7%B1%BB%E3%80%82%E4%B8%8D%E5%90%8C%E7%9A%84%E6%98%AF%EF%BC%8C%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B%E7%AE%97%E6%B3%95%E5%AF%B9%E4%BA%8E%E7%9B%AE%E6%A0%87%E7%9A%84%E4%BD%8D%E7%BD%AE%E6%98%AF%E6%9C%89%E6%A0%87%E7%AD%BE%E7%9A%84%EF%BC%8C%E8%80%8CHard-Attention%E6%98%AF%E6%97%A0%E6%A0%87%E7%AD%BE%E7%9A%84%E3%80%82"><span class="nav-text">1.1.3. 文章提出了Hard Attention与双阶段目标检测算法的相似性。他们都是截取图像块作为输入，然后进行分类。不同的是，目标检测算法对于目标的位置是有标签的，而Hard Attention是无标签的。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E6%9E%84"><span class="nav-text">1.1.4. 总结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Saccader-cell"><span class="nav-text">1.1.5. Saccader cell</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E7%AD%96%E7%95%A5"><span class="nav-text">1.1.6. 训练策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E5%AF%B9%E6%AF%94%E4%BA%86ordered-logits-policy%E5%92%8CSaccader"><span class="nav-text">1.1.7. 论文对比了ordered logits policy和Saccader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E4%B8%8A%E5%85%B6%E4%BB%96%E4%BD%8D%E7%BD%AE"><span class="nav-text">1.1.8. 空间上其他位置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hard-Attention-for-Scalable-Image-Classification"><span class="nav-text">1.2. Hard Attention for Scalable Image Classification</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-text">1.2.1. 介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%99%E7%AF%87%E6%96%87%E7%AB%A0%E4%BD%BF%E7%94%A8%E5%92%8C%E5%AE%9E%E7%8E%B0%E4%BA%86Saccader"><span class="nav-text">1.2.2. 这篇文章使用和实现了Saccader</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Soft-Attention"><span class="nav-text">2. Soft Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NAM-Normalization-based-Attention-Module"><span class="nav-text">2.1. NAM, Normalization-based Attention Module</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Regularization"><span class="nav-text">3. Regularization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ADCM-Attentnion-Dropout-Convolutional-Module"><span class="nav-text">3.1. ADCM: Attentnion Dropout Convolutional Module</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiang Ye"
+      src="/images/avatar_100.jpg">
+  <p class="site-author-name" itemprop="name">Xiang Ye</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://github.com/xyegithub" title="https:&#x2F;&#x2F;github.com&#x2F;xyegithub" rel="noopener" target="_blank">My Github</a>
+        </li>
+    </ul>
+  </div>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/12/14/Tips-in-Papers/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar_100.jpg">
+      <meta itemprop="name" content="Xiang Ye">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ye, Xiang's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Tips in Papers
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2021-12-14 16:33:03" itemprop="dateCreated datePublished" datetime="2021-12-14T16:33:03+08:00">2021-12-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-01-05 17:11:51" itemprop="dateModified" datetime="2022-01-05T17:11:51+08:00">2022-01-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/About-Papers/" itemprop="url" rel="index"><span itemprop="name">About Papers</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">记录阅读论文过程中，新获取的信息。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <html><head></head><body><h1 id="Hard-Attention"><span class="post-title-index">1. </span><a href="#Hard-Attention" class="headerlink" title="Hard Attention"></a>Hard Attention</h1><h2 id="2019-Scacader-Improving-Accuracy-of-Hard-Attention-Models-for-Vision"><span class="post-title-index">1.1. </span><a href="#2019-Scacader-Improving-Accuracy-of-Hard-Attention-Models-for-Vision" class="headerlink" title="2019 Scacader: Improving Accuracy of Hard Attention Models for Vision"></a>2019 Scacader: Improving Accuracy of Hard Attention Models for Vision</h2><h3 id="Hard-Attention选择相关的特征作为输入，是真正具有可解释性的。从下面第一段话，可以看出，hard-attention是真正和性能挂钩的。也一定和特征重要性是吻合的。但是Soft-Attention不具有可解释性，小权重的特征并不一定不重要"><span class="post-title-index">1.1.1. </span><a href="#Hard-Attention选择相关的特征作为输入，是真正具有可解释性的。从下面第一段话，可以看出，hard-attention是真正和性能挂钩的。也一定和特征重要性是吻合的。但是Soft-Attention不具有可解释性，小权重的特征并不一定不重要" class="headerlink" title="Hard Attention选择相关的特征作为输入，是真正具有可解释性的。从下面第一段话，可以看出，hard attention是真正和性能挂钩的。也一定和特征重要性是吻合的。但是Soft Attention不具有可解释性，小权重的特征并不一定不重要"></a>Hard Attention选择相关的特征作为输入，是真正具有可解释性的。从下面第一段话，可以看出，hard attention是真正和性能挂钩的。也一定和特征重要性是吻合的。但是Soft Attention不具有可解释性，小权重的特征并不一定不重要<div id="ap"></div></h3><blockquote>
+<p>Our best models narrow the gap to common ImageNet baselines, achieving 75% top-1 and 91% top-5 while attending to less than one-third of the image.We further demonstrate that occluding the image patches prposed by the Saccader model highly impairs classification, thus confirming these patches strong relevance to the classification task.</p>
+</blockquote>
+<blockquote>
+<p>Typical soft attention mechanisms rescale features at one or more stages of the network. The soft mask used for rescaling often to provide some insight into the model’s decision-making process, but the model’s final decision may nonetheless rely on information provided by features with small weights <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+</blockquote>
+<h3 id="文中glimpse的含义，可以理解成每一个位置，即每一个patch，就是一个glimpse。"><span class="post-title-index">1.1.2. </span><a href="#文中glimpse的含义，可以理解成每一个位置，即每一个patch，就是一个glimpse。" class="headerlink" title="文中glimpse的含义，可以理解成每一个位置，即每一个patch，就是一个glimpse。"></a>文中glimpse的含义，可以理解成每一个位置，即每一个patch，就是一个glimpse。</h3><blockquote>
+<p>Models that employ hard attention make decisions based on only a subset of pixel in the input image, typically in the form of a series of glimpses.</p>
+</blockquote>
+<h3 id="文章提出了Hard-Attention与双阶段目标检测算法的相似性。他们都是截取图像块作为输入，然后进行分类。不同的是，目标检测算法对于目标的位置是有标签的，而Hard-Attention是无标签的。"><span class="post-title-index">1.1.3. </span><a href="#文章提出了Hard-Attention与双阶段目标检测算法的相似性。他们都是截取图像块作为输入，然后进行分类。不同的是，目标检测算法对于目标的位置是有标签的，而Hard-Attention是无标签的。" class="headerlink" title="文章提出了Hard Attention与双阶段目标检测算法的相似性。他们都是截取图像块作为输入，然后进行分类。不同的是，目标检测算法对于目标的位置是有标签的，而Hard Attention是无标签的。"></a>文章提出了Hard Attention与双阶段目标检测算法的相似性。他们都是截取图像块作为输入，然后进行分类。不同的是，目标检测算法对于目标的位置是有标签的，而Hard Attention是无标签的。</h3><blockquote>
+<p>Altough our aim in this work is to perform classification with only image-level class labels, out approach bears some resembalance to two-stage object detection models. </p>
+</blockquote>
+<blockquote>
+<p>These models operate by generating many region proposals and then applying a classification model to each proposal. </p>
+</blockquote>
+<blockquote>
+<p>Unlike our work, these approaches use ground-truth bounding boxes to train the classification model, and modern architectures also use bounding boxes to supervise the proposal generator.</p>
+</blockquote>
+<p><strong>目标检测和Hard Attention的相似之处在于，他们都同时关注目标的位置和类别。相比于目标检测，Hard Attention可以做的更精细, i.e., 它可以像目标检测一样在图像域上挑选特征，它还可以在任意一个特征域里挑选特征；它不仅可以像目标检测一样，挑选空域的特征，还可以挑选通道域的特征。</strong></p>
+<h3 id="总结构"><span class="post-title-index">1.1.4. </span><a href="#总结构" class="headerlink" title="总结构"></a>总结构</h3><p><img src="Saccader_Over.jpg"></p>
+<p>最上面的rep. net以及logits per location之前都属于representation network。这部分挺常规，但是使用了‘BagNet’<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>的方法，该方法保持了输出特征图中每个像素的感受野大小。</p>
+<p>下面的atten. net就是几个卷积层的堆叠。没有attention机制。到Sacadder cell之前都是常规操作，除了一个what和where的concat得到mixed。</p>
+<p>Saccader cell是技术关键点。</p>
+<p><strong>coordinate at time t的slice操作，对于坐标的选择而言，是一个不可导的操作。这里是强化学习介入的地方。而且注意，这里t是一个序列，最后的prediction是求平均。</strong></p>
+<h3 id="Saccader-cell"><span class="post-title-index">1.1.5. </span><a href="#Saccader-cell" class="headerlink" title="Saccader cell"></a>Saccader cell</h3><p><img src="Saccader_Cell.jpg"></p>
+<p>值得注意的几点</p>
+<ol>
+<li><p>Cell state是一个state的序列，每个state都是一个经过2d softmax的logit。这个logit表示该state预测的位置。</p>
+<blockquote>
+<p>This cell produces a sequence of locations. Elements in the sequence correctpond to target locations.</p>
+</blockquote>
+</li>
+<li><p>需要保证cell state中预测之间都是不同的。$C^t$记录了t时刻位置探索过的所有位置。那些位置的值是1。所以$C^{t - 1}$两次介入$C^t$的计算都乘以一个非常小的数$-10^5$ ，这样就保证了在2d softmax的时候，探索过的位置无法胜出。</p>
+<blockquote>
+<p>The cell includes a 2D state ($C^t$) that keeps memory of the visited locations until time t by placing 1 in the corresponding location in the cell state. We use this state to prevent the network from returning to previously seen locations.</p>
+</blockquote>
+<p><strong>从这里也看出state和sequence是不同的。state是记录探索过的位置。从途中可以看出state是非01的，而由1可知，sequence应该是图中右边产生logic。state的目的，其实也是为了产生logic。</strong></p>
+</li>
+<li><p>在制作$C^t$的过程中，信息来源有两个mixed feature和$C^{t - 1}$。最后得到的$C^t$通道是1，所以mixed feature空间维度的压缩是必然的。在压缩的时候，选用了channel attention机制。channel attention机制又需要先空间压缩，这里不像SE-Net一样直接压缩空间，而是又做了一个空间的mask 压缩空间，这个mask用了$C^{t - 1}$的信息，去除掉了已经探索的位置信息。</p>
+</li>
+<li><blockquote>
+<p>At test time, the model extracts the logits at time $t$ from the representation network at location $argmax_{i,j}(\hat{R}^t_{i,j})$.The final prediction is obtained by averaging the extracted logits across all times.</p>
+</blockquote>
+</li>
+</ol>
+<p><strong>Saccader Cell的关键就在于产生一系列的sequence。这些sequence可以用强化学习算法优化，使其可以预测物体的位置，从而就进行了feature的选择。</strong></p>
+<h3 id="训练策略"><span class="post-title-index">1.1.6. </span><a href="#训练策略" class="headerlink" title="训练策略"></a>训练策略</h3><blockquote>
+<p>The goal of our training is to learn a policy that predicts a sequence of visual attentnion locations that is useful to the downsteam task (here image classification) in absence of location labels.</p>
+<p>We performed a three step training procedure using only the training class lables as supervision.</p>
+</blockquote>
+<p><img src="Saccader_eq1.jpg"></p>
+<ol>
+<li><p>预训练了representation network</p>
+<p>这个公式增大了目标$y_{target}$的概率。增大的某个位置上$y_{target}$的概率，而且所有位置连乘之后的概率。这里假设region of interest的概率将会被增大的最多。通过这种方法就自动学习到了一些好的position，在强化学习优化的时候，提供了一个好的探索的起点。</p>
+<blockquote>
+<p>Key to Saccader is a pretraining step that require only class lables and provides initial attention locations for policy gradient optimization.</p>
+</blockquote>
+<blockquote>
+<p>Our pretraining procedure overcomes the sparse-reward problem that makes hard attention models difficult to optimize. It requires access to only class lables and prvides initial attention locations.These initial locations provide better rewards for the policy gradient learning.</p>
+</blockquote>
+</li>
+</ol>
+<p><img src="Saccader_eq2.jpg"></p>
+<ol start="2">
+<li><p>训练了location network (attention network, $1 \times 1$ mixing convolution and Sacader cell)</p>
+<p>这是一个自监督的预训练。提高了前T = 12次预测的点的概率。</p>
+<p>文中说排序了，我感觉排序的次序和预测的次序是一致的。第一次预测是概率最大的，最后一次预测是概率最小的。后面实验对比了该预训练对性能的影响。然而，<font color="red">现在还并不能完全了解这个预训练的作用机制。 </font></p>
+</li>
+</ol>
+<p><img src="Saccader_eq3.jpg"></p>
+<ol start="3">
+<li><blockquote>
+<p>we trained the whole model to maximize the expected reward, where the reward ($r \in {0, 1}$) represents whether the model final prediction after 6 glimpses (T = 6) is correct. </p>
+</blockquote>
+</li>
+</ol>
+<p><font color="red">这个公式并没有完全读懂。</font></p>
+<p>用的是策略网络的方法。$l^t_s$是按saccader cell输出的位置概率生成的位置。公式的第一行就是增大这个概率的值。当模型最后做出了正确预测的时候，r权重大，损失函数以更大的权重增大这个预测的概率，这就是策略网络的方法。等式的第二行是修正分类网络，当预测正确的时候，那么有监督的增大这T个预测位置在$y_{target}$上的准确率。</p><div id="空间"></div> <p></p>
+<p><strong>由公式1和公式3看出，对于图像空间，loss函数只是增大预测点$y_{target}$的概率，然后不会理会，空间上其他点预测的是什么。</strong></p>
+<p>如果saccader cell的性能非常好，那么模型是没问题的。如果saccader cell预测会有误差，比如抗干扰能力不好，预测到目标以外的patch上，那么性能会被影响。 </p>
+<p><strong>论文中说，<a href="#ap">当预测的位置不存在的时候，模型的性能受到很大的影响。那么其实抑制预测之外的位置的，激活值会使得可以解释性更强？</a></strong></p>
+<h3 id="论文对比了ordered-logits-policy和Saccader"><span class="post-title-index">1.1.7. </span><a href="#论文对比了ordered-logits-policy和Saccader" class="headerlink" title="论文对比了ordered logits policy和Saccader"></a>论文对比了ordered logits policy和Saccader</h3><blockquote>
+<p>An ordered logits policy uses the BagNet model to pick the top K locations based on the largest class logits.</p>
+</blockquote>
+<p>Ordered logits policy选择了在空间上最大激活的位置，作为物体的位置，并把该预测作为物体类别的预测。</p>
+<blockquote>
+<p>The ordered logits policy strats off with accuracy much higher than a random policy, suggesting that the patches it initially picks are meaningful to classification.</p>
+<p>However, accuracy is still lower than the learned Saccader model, and <strong>performacne improves only slowly with additional glimpese. The ordered logits policy is able to capture some of the features relevant to classification, but it is a greedy policy that produces glimpses that cluster around a few top features (i.e., with low image coverage)</strong></p>
+</blockquote>
+<p>ordered logits policy的缺陷在于，只关注了最重要的少数的特征。它的预测都围绕在这些最重要的特征周围，所以增加glimpese的时候，很少新的信息引入，所以performance增长的很慢，而Saccader没有这个问题，它关注了完整的信息。</p>
+<h3 id="空间上其他位置"><span class="post-title-index">1.1.8. </span><a href="#空间上其他位置" class="headerlink" title="空间上其他位置"></a>空间上其他位置</h3><p>如<a href="#%E7%A9%BA%E9%97%B4">上文所说</a>，Sccader只优化选中的位置，不管没有被选中的位置。那么当增加glimplese的时候，它的性能应该会受到影响的。但是不是。</p>
+<blockquote>
+<p>In fact, increasing the number of glimpses beyond the number used for DRAM policy training leads to drop in performane, ulike the Saccader model that generalizes to greater umbers of glimpses.</p>
+</blockquote>
+<p><img src="Saccader_gl.jpg"></p>
+<p>如图可以看出，增大glimpses的时候，准确率反而在增加。说明在训练的时候，没有被训练到的地方，Saccader的预测也还可以，与<a href="#%E7%A9%BA%E9%97%B4">上文所说</a>的理解不同。<font color="red">原因是什么还有待探究。</font></p>
+<h2 id="Hard-Attention-for-Scalable-Image-Classification"><span class="post-title-index">1.2. </span><a href="#Hard-Attention-for-Scalable-Image-Classification" class="headerlink" title="Hard Attention for Scalable Image Classification"></a>Hard Attention for Scalable Image Classification</h2><h3 id="介绍"><span class="post-title-index">1.2.1. </span><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p><img src="Tnet_over.jpg"></p>
+<blockquote>
+<p>Muti-scale processing in the proposed TNet architecture. Starting from level 1, the image is processed in low resolution to get a coarse description of its content (red cube). Extracted features are used for (hard) selection of image regions worth processing in higher resolution. The process is repeated recursively (here to 2 additional levels). Features from all levels are combined (arrows on the right) to create the final image representation used for classificaiton (blue cube).</p>
+</blockquote>
+<h3 id="这篇文章使用和实现了Saccader"><span class="post-title-index">1.2.2. </span><a href="#这篇文章使用和实现了Saccader" class="headerlink" title="这篇文章使用和实现了Saccader"></a>这篇文章使用和实现了Saccader</h3><h1 id="Soft-Attention"><span class="post-title-index">2. </span><a href="#Soft-Attention" class="headerlink" title="Soft Attention"></a>Soft Attention</h1><h2 id="NAM-Normalization-based-Attention-Module"><span class="post-title-index">2.1. </span><a href="#NAM-Normalization-based-Attention-Module" class="headerlink" title="NAM, Normalization-based Attention Module"></a>NAM, Normalization-based Attention Module</h2><h1 id="Regularization"><span class="post-title-index">3. </span><a href="#Regularization" class="headerlink" title="Regularization"></a>Regularization</h1><h2 id="ADCM-Attentnion-Dropout-Convolutional-Module"><span class="post-title-index">3.1. </span><a href="#ADCM-Attentnion-Dropout-Convolutional-Module" class="headerlink" title="ADCM: Attentnion Dropout Convolutional Module"></a>ADCM: Attentnion Dropout Convolutional Module</h2><p><img src="ADCM.jpg" alt="ADCM"></p>
+<p>在CBAM的基础上加入了正则化，把CBAM产生的attention weights作为Drop的概率引导，来对feature map进行drop。是一种对attention机制的正则化方法，很容以把它误解为hard attention。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style:none; padding-left: 0;"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">1.</span><span style="display: inline-block; vertical-align: top;">2018,Learn to pay attention.</span><a href="#fnref:1" rev="footnote"> ↩</a></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px;">2.</span><span style="display: inline-block; vertical-align: top;">2019, Approximating CNNs with bag-of-local-features models works surprisingly well on ImageNet.</span><a href="#fnref:2" rev="footnote"> ↩</a></li></ol></div></div></body></html>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Personal-Thought/" rel="tag"># Personal Thought</a>
+              <a href="/tags/Papers/" rel="tag"># Papers</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/12/10/An-Introduction-to-Git/" rel="prev" title="An Introduction to Git">
+                  <i class="fa fa-chevron-left"></i> An Introduction to Git
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/12/15/Personal-Thought/" rel="next" title="Personal Thought">
+                  Personal Thought <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Ye</span>
+</div>
+
+<script language=javascript>
+    function siteTime() {
+        window.setTimeout("siteTime()", 1000);
+        var seconds = 1000;
+        var minutes = seconds * 60;
+        var hours = minutes * 60;
+        var days = hours * 24;
+        var years = days * 365;
+        var today = new Date();
+        var todayYear = today.getFullYear();
+        var todayMonth = today.getMonth() + 1;
+        var todayDate = today.getDate();
+        var todayHour = today.getHours();
+        var todayMinute = today.getMinutes();
+        var todaySecond = today.getSeconds();
+        /* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+        year - 作为date对象的年份，为4位年份值
+        month - 0-11之间的整数，做为date对象的月份
+        day - 1-31之间的整数，做为date对象的天数
+        hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+        minutes - 0-59之间的整数，做为date对象的分钟数
+        seconds - 0-59之间的整数，做为date对象的秒数
+        microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+        var t1 = Date.UTC(2021, 11, 20, 00, 00, 00); //北京时间2018-2-13 00:00:00
+        var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
+        var diff = t2 - t1;
+        var diffYears = Math.floor(diff / years);
+        var diffDays = Math.floor((diff / days) - diffYears * 365);
+        var diffHours = Math.floor((diff - (diffYears * 365 + diffDays) * days) / hours);
+        var diffMinutes = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours) / minutes);
+        var diffSeconds = Math.floor((diff - (diffYears * 365 + diffDays) * days - diffHours * hours - diffMinutes * minutes) / seconds);
+        document.getElementById("sitetime").innerHTML = "本站已运行 " +diffYears+" 年 "+diffDays + " 天 " + diffHours + " 小时 " + diffMinutes + " 分钟 " + diffSeconds + " 秒";
+    }/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+    siteTime();
+</script>
+
+<span id="sitetime"></span>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
