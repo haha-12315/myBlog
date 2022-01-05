@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://haha-12315.github.io/myBlog/2022/01/05/JJ/</loc>
+    <loc>https://haha-12315.github.io/myBlog/2022/01/05/Paper-Reading/</loc>
     
     <lastmod>2022-01-05</lastmod>
     
@@ -39,5 +39,12 @@
 
   
 
+  
+  <url>
+    <loc>https://haha-12315.github.io/myBlog/categories/Papers/</loc>
+    <lastmod>2022-01-05</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
   
 </urlset>
