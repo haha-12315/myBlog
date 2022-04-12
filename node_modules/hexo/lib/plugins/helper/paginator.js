@@ -30,6 +30,7 @@ const showAll = (tags, options, ctx) => {
   }
 };
 
+// It's too complicated. May need refactor.
 const pagenasionPartShow = (tags, options, ctx) => {
   const {
     current,
@@ -39,10 +40,10 @@ const pagenasionPartShow = (tags, options, ctx) => {
     mid_size: midSize
   } = options;
 
-  const leftEnd = Math.min(endSize, current - 1);
-  const rightEnd = Math.max(total - endSize + 1, current + 1);
-  const leftMid = Math.max(leftEnd + 1, current - midSize);
-  const rightMid = Math.min(rightEnd - 1, current + midSize);
+  const leftEnd = current <= endSize ? current - 1 : endSize;
+  const rightEnd = total - current <= endSize ? current + 1 : total - endSize + 1;
+  const leftMid = current - midSize <= endSize ? leftEnd + 1 : current - midSize;
+  const rightMid = current + midSize + endSize > total ? rightEnd - 1 : current + midSize;
   const spaceHtml = htmlTag('span', { class: 'space' }, space, false);
 
   const pageTag = createPageTag(options, ctx);
@@ -53,25 +54,29 @@ const pagenasionPartShow = (tags, options, ctx) => {
   }
 
   // Display spaces between edges and middle pages
-  if (space && leftMid - leftEnd > 1) {
+  if (space && current - endSize - midSize > 1) {
     tags.push(spaceHtml);
   }
 
   // Display left middle pages
-  for (let i = leftMid; i < current; i++) {
-    tags.push(pageTag(i));
+  if (leftMid > leftEnd) {
+    for (let i = leftMid; i < current; i++) {
+      tags.push(pageTag(i));
+    }
   }
 
   // Display the current page
   tags.push(pageTag(current));
 
   // Display right middle pages
-  for (let i = current + 1; i <= rightMid; i++) {
-    tags.push(pageTag(i));
+  if (rightMid < rightEnd) {
+    for (let i = current + 1; i <= rightMid; i++) {
+      tags.push(pageTag(i));
+    }
   }
 
   // Display spaces between edges and middle pages
-  if (space && rightEnd - rightMid > 1) {
+  if (space && total - endSize - midSize > current) {
     tags.push(spaceHtml);
   }
 

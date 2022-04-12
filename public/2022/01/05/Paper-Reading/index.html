@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width">
 <meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
-<meta name="generator" content="Hexo 6.0.0">
+<meta name="generator" content="Hexo 5.4.1">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/myBlog/images/apple-touch-icon-next.png">
@@ -27,7 +27,7 @@
 <meta property="og:site_name" content="Haha&#39;s Blog">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-01-05T10:01:04.000Z">
-<meta property="article:modified_time" content="2022-01-05T10:07:28.643Z">
+<meta property="article:modified_time" content="2022-04-12T11:27:29.281Z">
 <meta property="article:author" content="Haha">
 <meta name="twitter:card" content="summary">
 
@@ -117,7 +117,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Regularization"><span class="nav-text">1. Regularization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#WCD"><span class="nav-text">1.1. WCD</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#regularization"><span class="nav-text">1.  Regularization</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#wcd"><span class="nav-text">1.1.  WCD</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -132,19 +132,34 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/myBlog/archives/">
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/myBlog/categories/">
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/myBlog/tags/">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>
 
 
+  <div class="links-of-blogroll site-overview-item animated">
+    <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://github.com/xyegithub" title="https:&#x2F;&#x2F;github.com&#x2F;xyegithub" rel="noopener" target="_blank">My Github</a>
+        </li>
+    </ul>
+  </div>
 
         </div>
       </div>
@@ -200,9 +215,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2022-01-05 18:01:04 / Modified: 18:07:28" itemprop="dateCreated datePublished" datetime="2022-01-05T18:01:04+08:00">2022-01-05</time>
+      <time title="Created: 2022-01-05 18:01:04" itemprop="dateCreated datePublished" datetime="2022-01-05T18:01:04+08:00">2022-01-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2022-04-12 19:27:29" itemprop="dateModified" datetime="2022-04-12T19:27:29+08:00">2022-04-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -224,7 +245,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <html><head></head><body><h1 id="Regularization"><span class="post-title-index">1. </span><a href="#Regularization" class="headerlink" title="Regularization"></a>Regularization</h1><h2 id="WCD"><span class="post-title-index">1.1. </span><a href="#WCD" class="headerlink" title="WCD"></a>WCD</h2><p>fjadsf </p>
+        <html><head></head><body><h1 id="regularization"><span class="post-title-index">1. </span><a class="markdownIt-Anchor" href="#regularization"></a> Regularization</h1>
+<h2 id="wcd"><span class="post-title-index">1.1. </span><a class="markdownIt-Anchor" href="#wcd"></a> WCD</h2>
+<p>fjadsf</p>
 </body></html>
     </div>
 
@@ -236,6 +259,15 @@
 
         
 
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/myBlog/2022/04/12/GNN/" rel="next" title="GNN">
+                  GNN <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
     </footer>
   </article>
 </div>
@@ -284,7 +316,7 @@
         minutes - 0-59之间的整数，做为date对象的分钟数
         seconds - 0-59之间的整数，做为date对象的秒数
         microseconds - 0-999之间的整数，做为date对象的毫秒数 */
-        var t1 = Date.UTC(2022, 1, 5, 18, 00, 00); //北京时间2018-2-13 00:00:00
+        var t1 = Date.UTC(2021, 11, 20, 00, 00, 00); //北京时间2018-2-13 00:00:00
         var t2 = Date.UTC(todayYear, todayMonth, todayDate, todayHour, todayMinute, todaySecond);
         var diff = t2 - t1;
         var diffYears = Math.floor(diff / years);
@@ -319,8 +351,7 @@
 
   
 
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js","integrity":"sha256-r+3itOMtGGjap0x+10hu6jW/gZCzxHsoKrOd7gyRSGY="}}</script>
-<script src="/myBlog/js/third-party/math/mathjax.js"></script>
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css" integrity="sha256-9/mhQQwkpU5okPfM5l0v3LnP9xtc6JK8dKW0/WlGaUc=" crossorigin="anonymous">
 
 
 
