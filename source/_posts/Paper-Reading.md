@@ -91,7 +91,13 @@ dynamic graph --> 指每个 graph 的顶点 / 边随时间的变化而变化。
 
 面对很多不同的分类任务，首先需要对结构数据(structured data) 进行处理，通常的处理方式是 --> 将这些结构数据建模为 graphs。
 
-而针对那些顶点 / 边随时间的变化而变化的 dynamic graph 来说，目标则是 --> 利用现有的神经网络将这些数据集建模为随时间变化而变化的图结构(graph structures) 。--> 由于使用现有的架构不能解决目标问题，所以作者提出两种方法来实现这个目标，即：结合 Long Short-Term Memory networks 和 Graph Convolutional Networks 来学习长短期依赖关系和图结构。
+而针对那些顶点 / 边随时间的变化而变化的 dynamic graph 来说，目标则是 --> 利用现有的神经网络将这些数据集建模为随时间变化而变化的图结构(graph structures) 。--> 由于使用现有的架构不能解决上述目标，所以作者提出两种方法来实现这个目标，即：结合 Long Short-Term Memory networks 和 Graph Convolutional Networks 来学习长短期依赖关系和图结构。
+
+论文灵感：
+
+① GCNs 能有效解决图结构(graph-structured)信息，但缺乏处理随时间变化而变化的数据结构的能力，即：不能处理动态节点特征 + 不能处理动态边连接。
+
+② LSTMs 擅长发现长范围和短范围的序列依赖关系，但缺乏显示利用图结构信息的能力。
 
 
 
