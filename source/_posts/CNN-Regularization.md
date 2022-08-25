@@ -889,7 +889,7 @@ tags: CNN Regularization
 
 ## Abstract
 
-> 卷积神经网络很容易遭受过拟合问题的影响，因为它们在小型训练数据集的情况下经常被过度参数化（over-parameterized）。**<font color = green>传统的 dropout </font>** 随机丢弃 feature units 对于全连接网络效果很好，但 **<font color = green>由于中间特征的高空间相关性（high spatial correlation of the intermediate features）</font>** 而不能很好地正则化 CNNs，这**<font color = green>使得丢弃的信息流过网络，从而导致 under-dropping </font>**问题。为了更好地正则化 CNNs，已经提出了一些 structural dropout methods，例如 **<font color = blue>SpatialDropout 和 DropBlock</font>**，它们通过在连续区域中随机丢弃 feature units 来实现。然而，这些方法 **<font color = blue>可能会因为丢弃关键的判别特征（ critical discriminative features ）而遭受 over-dropping 问题</font>** ，从而限制了 CNNs 的性能。为了解决这些问题，我们提出了一种新颖的 structural dropout method，Correlation based Dropout（CorrDrop），通过 **<font color = purple>基于 feature correlation 丢弃 feature units</font>** 来正则化 CNNs。与之前的 dropout 方法不同，我们的 CorrDrop 可以 **<font color = purple>聚焦于判别信息（discriminative information），并以 spatial-wise 或 channel-wise 的方式丢弃 features</font>** 。在不同的数据集，网络架构和各种任务（如，图像分类和目标定位）上的广泛实验证明了我们的方法优于其他方法。
+> 卷积神经网络很容易遭受过拟合问题的影响，因为它们在小型训练数据集的情况下经常被过度参数化（over-parameterized）。**<font color = green>传统的 dropout </font>** 随机丢弃 feature units 对于全连接网络效果很好，但 **<font color = green>由于中间特征的高空间相关性（high spatial correlation of the intermediate features）</font>** 而不能很好地正则化 CNNs，这 **<font color = green>使得丢弃的信息流过网络，从而导致 under-dropping </font>** 问题。为了更好地正则化 CNNs，已经提出了一些 structural dropout methods，例如 **<font color = blue>SpatialDropout 和 DropBlock</font>**，它们通过在连续区域中随机丢弃 feature units 来实现。然而，这些方法 **<font color = blue>可能会因为丢弃关键的判别特征（ critical discriminative features ）而遭受 over-dropping 问题</font>** ，从而限制了 CNNs 的性能。为了解决这些问题，我们提出了一种新颖的 structural dropout method，Correlation based Dropout（CorrDrop），通过 **<font color = purple>基于 feature correlation 丢弃 feature units</font>** 来正则化 CNNs。与之前的 dropout 方法不同，我们的 CorrDrop 可以 **<font color = purple>聚焦于判别信息（discriminative information），并以 spatial-wise 或 channel-wise 的方式丢弃 features</font>** 。在不同的数据集，网络架构和各种任务（如，图像分类和目标定位）上的广泛实验证明了我们的方法优于其他方法。
 
 
 
@@ -1093,13 +1093,103 @@ tags: CNN Regularization
 
 
 
-
-
-
-
 ## 5 Conclusion
 
 > 本文引入了一种新颖的正则化技术，Channel DropBlock（CDB），该技术通过相关性度量对通道进行聚类，并在训练阶段随机丢弃一个相关通道组（a correlated channel group），从而破坏协同适配的特征通道（destructs feature channels from co-adaptations）。我们证明，与现有的 FGVC 方法相比，CDB 在增强特征表示和提取多种判别模式方面更加轻量级和有效。我们在三个经过广泛测试的细粒度数据集上进行了实验，验证了所提出方法的优越性。未来工作的两个特别有趣的方向包括探索具有自适应大小的通道分组方法，以及使用综合指标度量通道相关性。
+
+
+
+
+
+
+
+# FocusedDropout for Convolutional Neural Network_2021
+
+## Featured Application: 
+
+> 作者提出了一种 non-random dropout 非随机的 dropout 方法，称为 FocusedDropout，旨在使网络更关注目标。它可以有效地提高深度学习中特征学习的性能，可以用于任何具有深度学习技术的应用。
+
+
+
+## Abstract
+
+> 在卷积神经网络（CNN）中，dropout 不能很好地工作，**<font color = green>因为在特征空间相关的卷积层中，丢弃的信息并不完全被掩盖（dropout cannot work well because dropped information is not entirely obscured in convolutional layers where features are correlated spatially）</font>**。除了随机丢弃 regions 或 channels 之外，很多方法试图 **<font color = green>通过丢弃 influential units</font>** 来克服这一缺陷。在本文中，**<font color = purple>我们提出一种 non-random dropout方法，称为 FocusedDropout，旨在使网络更关注目标。</font>** 在 FocusedDropout 中，我们使用一种简单但有效的方法来**<font color = purple>搜索与目标相关的特征（to search for the target-related features），保留这些特征并丢弃其他特征</font>**，这与现有方法相反。我们发现这种新方法可以通过使网络更加专注于目标来提高网络性能。此外，在使用 FocusedDropout 时增加 weight decay 可以避免过拟合并提高准确率。实验结果表明，使用 FocusedDropout 的批处理比例为 10%，成本较低，在 CIFAR10，CIFAR100 和 Tiny ImageNet 等多个分类数据集上产生基线以上的较好的性能提升，并且对不同的 CNN  模型具有良好的通用性。
+
+
+
+## Keywords
+
+> classification; convolutional neural network; dropout; regularization
+
+
+
+## 1. Introduction
+
+> <img src=FocusedDropout_f1.png width=60% />
+>
+> 图1 CNN 中的四种 Dropout 形式。
+>
+> (a) Dropout 在每个 channel 上随机丢弃 units，然而，它在 CNN 上效果不佳；
+>
+> (b) SpatialDropout 随机丢弃 channel 而不是 units；
+>
+> (c ) DropBlock 随机丢弃一些受 Cutout 启发的连续区域；
+>
+> (d) 一些 non-random dropout 非随机 dropout 方法丢弃 influential units。
+>
+> 橙色的神经元、channel 和连续区域表示丢弃的部分，灰色的部分会被保留。
+
+
+
+> 在本文中，我们提出 FocusedDropout 作为一种 non-random dropout method 来正则化 CNNs。受 Hence,Bau 等人提出的可视化方法 Network Dissection 的启发，我们首先选择平均激活值最高的通道，并丢弃该通道上激活值低于阈值的 units。然后，我们可以在 CNN 的空间不变性（spatial invariance of CNN）的支持下，我们可以通过丢弃所有在其余通道上与之前被丢弃的 units 具有相同位置的 units 来区分有用单元和冗余单元（we can distinguish useful units from redundant units with the support of spatial invariance of CNN by discarding all units that have the same positions as previously discarded ones on the rest of the channels）。在使用 FocusedDropout 时增加 weight decay 可以避免过拟合和提高准确性。结果，网络更多地关注与目标相关联的概率最高的 units，这对正则化特别有效。大量实验结果表明，即使成本很低， 10% 的 batches 使用 FocusedDropout，也可以在 CIFAR10，CIFAR100，Tiny ImageNet 上的基线上产生很好的性能提升，并且对不同的 CNN 模型具有良好的通用性，包括 ResNet，DenseNet，VGGNet 和 Wide-ResNet。
+
+
+
+> 这项工作提供了以下主要贡献：
+>
+> 1. 这篇文章提出了一种 non-random dropout 方法来正则化 CNNs，名为 FocusedDropout。与之前的工作丢弃 influential units 不同，它通过丢弃其它的来增强与分类相关的特征，从而有效地提高分类性能。
+> 2. 我们还提出一种辅助训练技巧来避免过拟合，在使用 FocusedDropout 的同时放大 the weight decay，并且只随机选择 10% 的 batches 来使用所提出的方法。
+> 3. 进行了大量的实验来验证性能。结果表明 FocusedDropout 是轻量级的，在许多任务中取得了最好的成绩。
+
+
+
+## 4. Our Approach
+
+> <img src=FocusedDropout_f3.png width=100% />
+>
+> 图3 FocusedDropout 的图解。选择激活值最高的 channel 作为 reference channel 来生成 the binary mask。被 the mask 覆盖之后，最有可能与目标相关的 units 将被保留，其它的将被丢弃。橙色代表被 FocusedDropout 丢弃的神经元。
+
+
+
+## 6. Conclusion
+
+> 在这项工作中，我们引入了一种名为 FocusedDropout 的新的正则化方法。**<font color = purple>受 Network Dissection 的启发，我们发现 CNN 的高激活值 units 通常对应于分类目标，因此，FocusedDropout 首先选择平均激活值最高的 channel 作为 reference channel 参考通道，并从中找到 the preferred area 首选区域，然后由于CNN 的空间不变性（spatial invariance ），所有通道只保留该区域的 units。</font>** 大量实验证明，FocusedDropout 对不同模型上的不同数据集都有稳健的改进。此外，在使用 FocusedDropout 的同时增加 weight decay 可以防止网络过拟合。分类激活映射（the class activation mapping）表明，该模型可以更加精确地识别目标的位置和轮廓，并通过 FocusedDropout 来正则化。我们认为 FocusedDropout 提供了一种改善 dropout 的新方法：在使网络聚焦于目标和防止过拟合之间找到平衡。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
