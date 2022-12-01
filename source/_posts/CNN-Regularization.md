@@ -1113,7 +1113,7 @@ tags: CNN Regularization
 
 ## Abstract
 
-> 在卷积神经网络（CNN）中，dropout 不能很好地工作，**<font color = green>因为在特征空间相关的卷积层中，丢弃的信息并不完全被掩盖（dropout cannot work well because dropped information is not entirely obscured in convolutional layers where features are correlated spatially）</font>**。除了随机丢弃 regions 或 channels 之外，很多方法试图 **<font color = green>通过丢弃 influential units</font>** 来克服这一缺陷。在本文中，**<font color = purple>我们提出一种 non-random dropout方法，称为 FocusedDropout，旨在使网络更关注目标。</font>** 在 FocusedDropout 中，我们使用一种简单但有效的方法来**<font color = purple>搜索与目标相关的特征（to search for the target-related features），保留这些特征并丢弃其他特征</font>**，这与现有方法相反。我们发现这种新方法可以通过使网络更加专注于目标来提高网络性能。此外，在使用 FocusedDropout 时增加 weight decay 可以避免过拟合并提高准确率。实验结果表明，使用 FocusedDropout 的批处理比例为 10%，成本较低，在 CIFAR10，CIFAR100 和 Tiny ImageNet 等多个分类数据集上产生基线以上的较好的性能提升，并且对不同的 CNN  模型具有良好的通用性。
+> 在卷积神经网络（CNN）中，dropout 不能很好地工作，**<font color = green>因为在特征空间相关的卷积层中，丢弃的信息并不完全被掩盖（dropout cannot work well because dropped information is not entirely obscured in convolutional layers where features are correlated spatially）</font>**。除了随机丢弃 regions 或 channels 之外，很多方法试图 **<font color = green>通过丢弃 influential units</font>** 来克服这一缺陷。在本文中，**<font color = purple>我们提出一种 non-random dropout方法，称为 FocusedDropout，旨在使网络更关注目标。</font>** 在 FocusedDropout 中，我们使用一种简单但有效的方法来 **<font color = purple>搜索与目标相关的特征（to search for the target-related features），保留这些特征并丢弃其他特征</font>** ，这与现有方法相反。我们发现这种新方法可以通过使网络更加专注于目标来提高网络性能。此外，在使用 FocusedDropout 时增加 weight decay 可以避免过拟合并提高准确率。实验结果表明，使用 FocusedDropout 的批处理比例为 10%，成本较低，在 CIFAR10，CIFAR100 和 Tiny ImageNet 等多个分类数据集上产生基线以上的较好的性能提升，并且对不同的 CNN  模型具有良好的通用性。
 
 
 
@@ -1159,6 +1159,50 @@ tags: CNN Regularization
 >
 > 图3 FocusedDropout 的图解。选择激活值最高的 channel 作为 reference channel 来生成 the binary mask。被 the mask 覆盖之后，最有可能与目标相关的 units 将被保留，其它的将被丢弃。橙色代表被 FocusedDropout 丢弃的神经元。
 
+> FocusedDropout 是一种高度针对性的方法，它使网络更多地关注前景，而不是背景或噪声。**<font color = purple>FocusedDropout 的主要思想是保留与分类目标相关的首选位置的单元，并丢弃其他位置的单元。</font>** **<font color = green>根据 CNN 的空间不变性（spatial invariance），训练时图像特征的位置是固定的，因此具有相同空间位置的不同通道单元代表相同的图像特征。</font>** 受此现象的启发，FocusedDropout 使用一个二进制掩膜（a binary mask）来覆盖每个通道上具有相同位置的目标无关单元，如图 3 所示。 FocusedDropout 的算法如算法 1 所示。接下来，我们将介绍 FocusedDropout 的详细信息。
+
+> **Selecting the reference channel**
+>
+> 卷积层输出的每个通道可以看作是从图像中提取的一组特征。**<font color = green>我们的目标是找到最有可能获得与目标相关的特征的通道（Our goal is to find the channel with the highest possibility to obtain the features relevant to the target）。</font>** 我们观察到平均激活值最大的通道对结果的影响最大，我们认为它包含最重要的特征。因此，FocusedDropout 使用 Global Average Pooling 来获取每个通道的平均激活值。为方便介绍，我们引入一下概念。
+>
+> $C = [c_1, c_2, \dots, c_n]$ 表示来自上一层的整个通道， $c_i$ 表示 the single-channel，即整个特征图（the entire feature map），$c_i(x, y)$ 表示 $c_i$ 上一个单元的激活值。因此 $c_i$ 的平均激活值计算为：
+>
+> <img src=FocusedDropout_e1.jpg width=40% />
+>
+> 其中 $w$ 和 $h$ 是所有通道的共享宽度和高度。在获得所有的权重之后，我们选择最大的一个 $c_k$ 作为参考通道（reference channel），$k$ 计算为：
+>
+> <img src=FocusedDropout_e2.jpg width=40% />
+
+> **Finding the focused area**
+>
+> 在获得参考通道之后，我们需要从中获取目标相关特征的位置信息。激活值高的单元对任务的影响更大，因此，我们首先在参考通道上找到最高的激活值 $c_k(\overline{x},\overline{y})$ 作为设置阈值的标准，其中，$(\overline{x},\overline{y})$ 被设置为：
+>
+> <img src=FocusedDropout_e3.jpg width=40% />
+>
+> 我们取 0.3-0.6 之间的一个随机比率（a random ratio）$\gamma$ 并设阈值为：
+>
+> <img src=FocusedDropout_e4.jpg width=40% />
+>
+> **<font color = purple>我们设置了一个 random ratio 而不是一个 certain ratio，因为不同的图像有不同数量的特征。</font>** **<font color = green>激活值高于阈值的单元被认为是与目标相关的单元。</font>** 这些单元位置的组合被认为是与目标相关的区域，即 focused area。
+
+> **Generating the binary mask**
+>
+> 虽然 the focused area 是从 the reference channel 中获得的，但由于 CNN 的空间不变性（the spatial invariance of CNN），其他通道上相同区域的单元仍然与目标相关。也就是说，来自前一层的不同通道从图像中提取了各种特征，但这些通道相同位置代表了图像的相同位置。因此我们需要保留每个通道在首选区域的单元。为了简化计算，我们使用了一个二进制掩码乘以所有的通道来实现这一步骤。二进制掩码（the binary mask）满足
+>
+> <img src=FocusedDropout_e5.jpg width=40% />
+>
+> 其中，$m(i,j)$  表示二进制掩码的值，$A$ 表示 the focused area。当二进制掩码乘以所有通道时，只有 the focused area 中包含的单元可以被保留。
+
+> **Magnifying weight decay（MWD）**
+>
+> **<font color = purple>在训练期间，我们随机选择 10% 的 batches 使用 FocusedDropout，而不是每一个 batch（During training, we randomly choose 10% of batches using FocusedDropout rather than every batch）。</font>** **<font color = green>仅保留 the high-weight units  可能会加重过拟合，因此我们在使用 FocusedDropout 时增加权重衰减（increase weight decay），可以限制网络对分类目标的过度关注，抑制过拟合。</font>** 这是一种新的 dropout 训练技巧，因为 dropout 通常用于每个 epoch 的所有批次中(used in all batches of every epoch)，并且在训练阶段 weight decay 是固定的。我们将应用于 FocusedDropout 的批次率（the rate of batches）称为 $participation_rate$。通过这个技巧可以明显减少计算资源和时间消耗，并提高模型性能。在测试阶段，我们将所有的单元保留为传统的 dropout。
+
+> <img src=FocusedDropout_a1.jpg width=60% />
+
+
+
+
+
 
 
 ## 6. Conclusion
@@ -1169,65 +1213,179 @@ tags: CNN Regularization
 
 
 
+# Regularization Overview_zjf
+
+> <img src=RegularizationOverview_zjf.jpg width=120% />
 
 
 
 
 
+## 1 Regularization
 
+> Deep CNNs --> over-parameterization -->over-fitting --> Regularization
+>
+> over-fitting：随着模型复杂度增加，训练误差减小，测试误差不减。
+>
+> **Regularization**：凡是能使模型的泛化能力增强，在测试集上产生更好的效果的技术都能被称为正则化。
 
+> **<font color = green>Weight decay</font>** ：在损失函数（cost function）中添加一个惩罚项，即：在损失函数loss上增加了L1或L2范数项，达到参数惩罚的作用。
+>
+> **<font color = green>Feature Normalization</font>** ：把特征图的均值归一化为0，方差归一化为1，实验证明，这类方法能加速收敛并提高网络的泛化性能。
+>
+> 根据归一化的维度的不同，可以分为：batch normalization，layer normalization，instance normalization，group normalization。
+>
+> **<font color = green>Early Stopping</font>** ：在网络过拟合之前停止训练。即：在测试误差开始上升之前，就停止训练,即使此时训练尚未收敛(即训练误差未达到最小值)。
+>
+> **<font color = green>Data Augmentation</font>** ：增加训练数据集，让数据集尽可能的多样化，使得训练的模型具有更强的泛化能力。数据增广方式有：旋转/翻转/平移/饱和度/对比度/色彩抖动/随机裁剪/尺度变换/高斯处理/仿射变换等一系列处理。
+>
+> **<font color = green>Dropout</font>** ：2014年由 hinton 提出。在神经网络训练过程中，随机丢弃一部分神经元，来减低模型对部分神经元的依赖，从而降低网络过拟合的风险。
 
 
 
+## 2 Dropout 
 
+> **<font color = blue>Dropout</font>** ：2014年由 hinton 提出。在神经网络训练过程中，随机丢弃一部分神经元，来减低模型对部分神经元的依赖，从而降低网络过拟合的风险。
+>
+> 传统的 Dropout 随机丢弃 feature units，丢弃的对象是单个的神经元，但由于卷积层特征的高空间相关性，会使得丢弃的信息流过网络（因为空间相关的特征仍然允许丢弃的信息在网络中流动）从而导致 **<font color = blue>under-dropping</font>** 问题，不能很好地正则化 CNNs。
+>
+> 为了解决 **<font color = blue>under-dropping</font>** 问题，研究者改变了 drop 的对象，从随机丢弃单个神经元，演变成另外两种随机丢弃方式：
+>
+> • **随机丢弃空间中的 square of region（DropBlock）**
+>
+> • **随机丢弃整个 channel**
+>
+> 然而，由于特征单元以随机的方式在连续区域中被丢弃，没有考虑图像中的语义信息，所以上面两种随机的方式又容易导致 **<font color = blue>over-dropping</font>** 的问题。
+>
+> 为了解决 **<font color = blue>over-dropping</font>** 问题，研究者转变思路，由完全随机的丢弃策略转变为有导向的丢弃策略，
+>
+> 同上，有导向性的丢弃策略又可以分为对空间的 dropout 和对通道的 dropout。
+>
+> 目前，有导向的 dropout 方法分为两类：
+>
+> • **<font color = blue>基于特征重要性等级</font>** (WCD_AAAI_2019，CorrDrop_PR_2021，CLDM) --> 基于某种度量评估方式对空间中的**连续区域或着每个通道**进行重要性等级的评估，然后再根据评估结果来指导需要 drop 的区域，将评估得分高的以较高的概率保留。
+>
+> • **<font color = blue>基于注意力机制</font>**（ADCM_Neurocomputing_2020）-->将 attention 和 dropout 集成到一个通用的轻量级模块中，根据相应的 attention 机制（ADCM 中使用的是 SE-Net）算出通道 / 连续区域的激活状态，再对通道或区域进行过滤。
 
 
 
+## 3 Our Idea
 
+> **idea** --> 红海方向的蓝海！
+>
+> **<font color = purple>Transformer + Dropout --> 空间注意力 dropout</font>**
+>
+> **因为 Transformer 能把图像分块，得到多个 patches，每一个 patch 将会获得一个注意力系数，再根据注意力系数决定每个 patch 是否需要被 drop。**
 
 
 
 
 
+# An Image is Worth 16 * 16 Words: Transformers for Image Recognition at Scale_ICLR_2021
 
+> 受 Transformer 在 NLP 成功的启发，我们实验直接将标准 Transformer 用于图像，并进行尽可能少的修改。为此，我们将图像分解成图像块，然后将这些图像块的线性嵌入式序列作为 Transformer 的输入。图像块等同于 NLP 中的 tokens(words)的概念，我们使用监督方式在图像分类任务上训练模型。
 
+> 模型整体结构：
+>
+> <img src=VisionTransformer_f1.jpg width=111% />
+>
+> 图1：模型概述。将图像分割为固定大小的 patches，对每个块进行 linearly embed，添加 position embeddings，并将得到的向量序列送入标准的 Transformer 编码器。为了进行分类，我们使用标准的方法在序列中添加一个额外的可学习的"classification token"。Transformer 编码器的插图受到 Vaswani 等人（2017）的启发。
 
+> 因为：
+>
+> 标准的 Transformer --> 接收 1维 token embeddings 序列作为 input。
 
+> 所以：
+>
+> 对于 2维 图像 $X \in R^{H \times W \times C}$ --> reshape: flattened 2D patches $X_p \in R^{N \times (P^2 \times C)}$
+>
+> 其中，$(H, W)$ ：原始 image 分辨率；C：通道数量；$(P, P)$ :每个 image patch 的分辨率；$N = \frac{H \times W}{P \times P}$，patch 的数量，也是 transformer 有效输入序列的长度。
+>
+> <img src=VisionTransformer_e1.jpg width=100% />
+>
+> **<font color = green>Transformer 的所有层均使用固定维度 $D$ 的隐藏向量</font>**
+>
+> 所以：**<font color = purple>使用一个可训练的线性层将图像块映射到 $D$ 维。</font>** 如式(1)所示，我们将该线性映射的输出称为 patch embeddings。
+>
+> 类似于 BERT 方法中的[class]token，我们在 patch embeddings 之前增加了一个可学习的 embedding:$z_0^0 = x_{class}$，它在 Transformer 编码器输出端的状态 $z_L^0$ 作为图像的表征$y$，如式(4)所示。
+>
+> 分类头在预训练阶段由带有一个隐藏层的 MLP 实现，微调阶段时由一个线性层实现。
+>
+> position embeddings 加在 patch embeddings 之后，用于保留位置信息。由于使用更加高级的 2维 position embeddings 并未带来明显的性能提升，这里我们仅使用标准的可学习的 1维 position embeddings。最终加入 position embeddings 得到的向量序列作为 Transformer 编码器的输入。
+>
+> Transformer 编码器由包含多头自注意力（MSA），MLP 块的层组成。每个块之前应用一个 Layernorm(LN)层，每个块之后有一个残差连接。MLP 包含两个带有 GELU 的非线性层。  
 
 
 
 
 
+## https://blog.csdn.net/weixin_44106928/article/details/110268312
 
+> Vision Transformer 结合 CV 和 NLP 领域知识，对 input image 进行分块，展平成序列，输入原始 Transformer 模型的编码器 Encoder 部分，最后接入一个全连接层进行分类。					
 
 
 
+### 数据处理部分
 
+> 原始输入的图片数据是 $H \times W \times C$，**<font color = green>先对图片做分块，再进行展平。</font>**
+>
+> 假设每个 patch 的长宽为 $(P, P)$，那么 patch 的数目为：
+>
+> $$N = H \times W / (P \times P)$$
+>
+> **<font color = green>然后将每个 patch 展平成一维向量，</font>** 每个向量大小为：
+>
+> $$P \times P \times C$$
+>
+> 总的输入变换为：
+>
+> $$N \times (P^2 \times C)$$
 
 
 
+### Patch Embedding
 
+> **<font color = green>接着对每个向量都做一个线性变换（即全连接层），</font>** 压缩维度为 $D$，这里我们称其为 Patch Embedding。 
 
 
 
+### Positional Encoding
 
+> **<font color = green>原始的 Transformer 引入了一个 Positional Encoding 来加入序列的位置信息，</font>** Vision Transformer 在这里同样引入 pos_embedding，是用一个可训练的变量来代替。
 
 
 
+### class_token
 
+> **<font color = blue>seq2seq</font> 解决问题的主要思路** 是通过深度神经网络模型（常用的是 LSTM，长短记忆网路，一种循环神经网络），将一个作为输入的序列映射为一个作为输出的序列，这一过程由编码（Encoder）输入与解码（Decoder）输出两个环节组成，编码器负责把序列编码成一个固定长度的向量，这个向量作为输入传给解码器，解码器输出可变长度的向量。
 
+> 因为传统的 Transformer 采取的是类似 seq2seq 编解码的结构，而 Vision Transformer 只用到了 Encoder 编码器结构，缺少了解码的过程。假设 9 个向量经过编码器之后，应该选择哪一个向量进入到最后的分类头是一个问题。因此这里**<font color = green>作者给了额外的一个用于分类的向量，与输入进行拼接。</font>** 这同样是一个可学习的变量。
 
 
 
+## 分类
 
+> 分类头是加入了 LayerNorm 和两层全连接层实现的，采用的是 GELU 激活函数。
+>
+> 最终分类只取第一个，也就是用于分类的 token，输入到分类头里，得到最后的分类结果。
 
 
 
+----------------------------------------------------------------------------------------------------------------
 
 
 
+### Self-Attention
 
+> **<font color = green>Transformer</font>** 放弃使用传统的 RNN 顺序结构而 **<font color = green>采用 self-attention 机制来使得模型能够并行化训练且掌握全局信息。</font>**
+>
+> 为了将 Transformer 模型适用于图像，**<font color = blue>Vision Transformer 将图像分割成很多子块并将这些子块组成线性嵌入序列，然后将这些线性嵌入序列作为 Transformer 的输入以模拟在 NLP 领域中词组序列输入。</font>**
+>
+> **<font color = green>Transformer 模型是以 self-attention 为基础的，通过 self-attention 完成模型的并行化训练。</font>**
+>
+> 
 
+​                                    	 	 
 
 
 
@@ -1237,81 +1395,550 @@ tags: CNN Regularization
 
 
 
+# Scheduled DropHead: A Regularization Method for Transformer Models_2020
 
+## Abstract
 
+> 本文提出 DropHead，一种结构化的 dropout 方法（a structured dropout method），专门用于正则化 transformer 的关键组件多头注意力机制（the multi-head attention mechanism）。与随机 drop units 或 connections 的传统 dropout 机制相比，DropHead 在训练阶段丢弃整个 attention heads ，以防止多头注意力模型被一小部分 attention heads 控制。它可以帮助降低过拟合的风险，并使模型更好地从 the multi-head attention 中获益。考虑到多头性（multi-headedness）和训练动态性（training dynamics）的相互作用，我们进一步提出一种新的 dropout rate scheduler 来调整 DropHead 在整个训练过程中的 dropout rate，从而获得更好的正则化效果。实验表明，我们提出的方法可以在 WMT14 En-De translation task 中将 transformer 模型提高 0.9 BLEU score，在各种文本分类任务上的准确率约为 1.0。
+>
+> 
 
 
 
+# PatchDropout: Economizing Vision Transformers Using Patch Dropout_2022
 
+## Abstract
 
+> Vision transformers 已经证明了在各种视觉任务中超越 CNNs 的潜力。但是这些模型的计算和存储需求限制了它们在许多应用中的使用，特别是那些依赖于高分辨率图像的应用，例如医学图像分类。更有效地训练 ViTs 的努力过于复杂，需要进行框架修改或复杂的训练计划。**<font color = green>在这项工作中，我们展示了 standard ViT 模型可以通过随机丢弃 input image patches 以高分辨率进行有效训练。</font>** 这种简单的方法 PatchDropout，在标准的自然图像数据集（如 ImageNet）中减少了至少 50% 的 FLOPS 和内存，并且这些节省只会随着图像大小的增加而增加。在高分辨率医学数据集 CSAW 上，我们观察到使用 PatchDropout 可以节省 5倍的计算和内存，同时提高性能。对于具有固定计算或存储预算的从业者，PatchDropout 可以选择图像分辨率，超参数或模型大小，以从它们的模型中获得最大的性能。
 
 
 
+## 1. Introduction
 
+> Vision Transformers(ViTs) 最近被引入作为 CNNs 的一种可行替代方案。然而，由于计算瓶颈，在许多环境中尚未实现更好性能的承诺。例如，ViTs 需要在 [5] 上训练大型数据集，尽管在大型数据集上使用预训练已经部分解决了这个问题。内存和计算需求增加了这一点，因为 self-attention 机制引入了一个与 token 数量相关的二次复杂度元素（since the self-attention mechanism introduces an element with quadratic complexity w.r.t. the number of tokens）。这些瓶颈可能会导致过长的训练时间，并且对大型图像（例如医学图像分析中遇到的图像），<font color = green>计算和内存需求使得现有的 ViTs 不适合</font>。
 
 
 
+> <img src=PatchDropout_f1.jpg width=50% />
+>
+> 图1：**<font color = green>PatchDropout 可以用于在高分辨率图像上有效地训练现成的 ViTs。</font>** the input patches 的一小部分通常就足以进行准确的预测，如果使用更大分辨率的图像，性能可以提高，尽管会丢失信息。在这里，使用不同比例的 input patches 进行训练会影响模型在 CSAW（具有高分辨率图像的真实医学数据集） 上的性能。在相同的计算预算下， PatchDropout 可以提高预测性能。使用一个 16倍大的图像但保留 5% 的 patches 可以节省计算和内存，并提高性能。可以通过增加 the keep rate 来实现进一步的改进，但代价是计算量。在标准图像分类数据集中观察到类似的趋势。
 
+> 这些计算问题在其他领域上也很尖锐，例如，显微镜和遥感，特别是当原生分辨率不仅是一种期望的属性，而且是准确预测的要求时。因此，一些工作专注于使用大量不同的方法使 vision transformers 更有效，这些方法通常涉及某种后处理或架构修改。这些方法在推理过程中优先考虑高效，例如在移动设备中嵌入，已被证明可以在不影响性能的情况下将运行时间减少 30% 到 50%。然而，网络训练中的瓶颈问题也不容忽视。很少有工作解决了这个主题，而这些需要架构修改或复杂训练方案的工作限制了它们的使用。高效的 ViT 训练仍然是一个重要问题，特别是对于需要大图像的应用程序，因为除了最大的机构之外，所有机构都受到训练 ViTs 的计算资源的限制。
 
+> 在这项工作中，我们提出一个基本问题。在训练过程中，所有的 input patches 都是必要的吗？还是我们可以随机忽略其中的很大一部分？肯定的回答需要一种简单而有效的方法来减少计算和内存占用。**<font color = purple>我们的方法， PatchDropout，随机丢弃 input tokens，并在使用高分辨率图像时，在训练期间最多减少 5倍 的内存和计算，而不会影响模型的准确性（图1）</font>** 由于 ViTs 的性质，这可以通过现成的 vision transformers 和最小的 implementation 来实现。此外，我们表明，在给定内存和计算预算的情况下， PatchDropout 可以选择图像分辨率，超参数或模型大小，以从模型中获得最大性能。我们对具有高分辨率图像的真实医学数据集 CSAW 进行实验，并使用三个主流的数据集进一步验证所提出的方法：ImageNet，CIFAR-100 和 PLACES365。通过这些实验，我们表明：
+>
+> * 我们可以在训练过程中随机丢弃 image patches而不会影响性能，并且根据图像大小将效率从 2倍 提升到 5.6倍（见图1 和图5）
+> * 给定相同的计算预算，放大图像和/或利用更大的 ViT 变体，同时丢弃一部分 input tokens 可以提高模型的准确性（见表3 和表4）
+> * **<font color = green>PatchDropout 可以在训练过程中作为一种正则化技术，从而增加模型的鲁棒性</font>**（见图6）
 
+> 这些发现以及其它消融研究表明， PatchDropout 可以节省 ViTs，允许它们在高分辨率图像上的使用，在准确性和鲁棒性方面有潜在的提高。代码地址：https://github.com/yueliukth/PatchDropout
 
 
 
+## 2. Related Work
 
+> 一些研究已经研究了如何使用现有的训练有素的模型来获得更轻的 vision transformer model，以提高推理效率，例如，使用剪枝或 a teacher for distillation（用于蒸馏的教师）。**<font color = green>DynamicViT 增加了一个预测模块，用于逐步估计每一个 patch 的 importance score</font>** 。知识蒸馏有助于训练，并且在推理过程中修剪对最终预测贡献最小的 patches。另一种剪枝方法，**<font color = green>PatchSlimming</font>** 从最后一层识别不太重要的 patches，并将它们从前一层中删除。**<font color = green>DVT</font>** 通过使用越来越多的 patches 训练级联 transformers 来动态确定 patches 的数量，然后在预测确定之后中断推理。
 
+> 另一项研究着眼于提高训练效率。一些研究试图通过人工设计模块来优化网络架构，其中 **<font color = green>PatchMerger</font>** 和 **<font color = green>Token-Learner</font>** 专门为减少 tokens 的数量而设计的。**<font color = green>EViT</font>** 学习在训练过程中逐渐保留 the attentive tokens并融合 the inattentive tokens，这导致 ImageNet 上的精度下降 0.3%，而推理速度提高了 50%。**<font color = green>相比 EViT，本研究提出的方法是一种互补但机制更简单，不需要进行实质性修改。</font>**
 
+> 最近的一些工作探索了通过选择一个 patches 的子集来学习 expressive representations 的可能性。**<font color = green>MAE 是为了更有效的自监督预训练而设计的，提出丢弃高比例的 patches，然后通过自编码器设置来推断缺失的 patches。</font>** **<font color = purple>我们工作的灵感源自 MAE，然而，PatchDropout 可以直接使用 standard ViTs 应用于目标任务（不像 MAE）。</font>** 在【Learnable masked tokens for improved transferability of self-supervised vision transformers】中，作者用额外的 patches 增强了 standard ViTs，这些 patches 有选择性地关注一个 patches 集合，以提高 ViTs 的可移植性。最后，【Intriguing properties of vision transformers】表明 ViTs 对随机遮挡具有鲁棒性。然而，应该注意的是，遮挡并不会导致效率的提高。
 
 
 
+## 3. Methods
 
+> Transformer 模型最初是为语言相关任务开发的，但它们的 self-attention 机制已经被证明对视觉任务也是有用的。这两个任务之间的一个重要区别是，视觉数据在外观上通常包含相当多的冗余或相关性（见图2）。这一观察结果引出了以下问题：在训练过程中我们能随机忽略 input image patches？如果是，这样做有什么好处？在这里，我们旨在回答这些问题，表明 the vision transformers 的确可以使用一小部分 the input data 进行训练并表现 良好，同时节省大量内存和计算。此外，我们简单的训练方案可能会提供一些理想的正则化效果。
 
 
 
+### 3.1. PatchDropout
 
+> **<font color = purple>我们的核心思想依赖于这样一个事实，即可以利用图像数据中遇到的空间冗余来节省 vision transformers。</font>** 如果我们在训练期间随机拒绝模型的一部分信息，我们预计对模型预测性能的影响会减小。**<font color = purple>PatchDropout 通过在 the input level 随机丢弃一定百分比的 image tokens 来实现这一点（参见图3）。</font>**  更具体地说，在 the patch embedding 被送入 transformer blocks 之前， tokens 子集被随机采样而不进行替换。在随机采样之前添加 positional embeddings，以便保留相应的位置信息。 The [CLS] token 如果存在则保留。采样的 token 序列以标准方式被送至 transformer blocks。所提出的方法实现简单，这使得它无需大量修改即可将其合并到大多数 ViT 模型中。
 
+> <img src=PatchDropout_f3.jpg width=80% />
+>
+> 图3：训练和推理期间的 PatchDropout。（左）PatchDropout 很容易实现。修补图像并向每个 patch 添加 positional embeddings。均匀采样它们的子集并使用它们来训练模型。（右）在测试阶段，保留所有 patches。
 
 
 
+### 3.2. 复杂度分析
 
+> Vision transformers 在一系列 tokens 上操作，其中每个 token 对应一个非重叠 image patch，由 the patch 的线性投影与 a positional embedding 相加表示。实际上，一个大小为 $H \times W$ 的图像被平铺成 $HW/P^2$ 个 patches，其中 $P$ 是 the patch size，并且通常由用户定义（通常是 8 或 16）。得到的 token 序列被送入一系列连续的 transformer blocks 中，这些 transformer blocks 更新 tokens 的 d-dimensional embedding，并由 Multi-head Self-Attention(MSA) 和 Multi-Layer Perceptron modules(MLP) 组成。 MSA 本身包含一系列 MLP 层，   这些层通过注意力对 tokens 之间的交互进行建模。最后一个 MLP 层负责将输出投影为与其输入具有相同的尺寸，准备好由下一个 transformer block 处理。鉴于这些信息，可以讨论 vision transformers 的理论和经验计算复杂性。
 
+> **理论复杂度**  给定具有 $N$ 个 tokens 和 $d$ 维的 embeddings 的 $L$ 个 transformer blocks，MSA 模块内自注意力的计算成本为 $O(LN^2d)$，而其它 MLP 层引入 $O(LNd^2)$ 的复杂度。总的来说，一系列 $L$ 个 transformer blocks 的计算复杂度为：
+>
+> $$2LN^2d + 4LNd^2$$ 
+>
+> 计算始终与深度 $L$ 呈线性关系。当 $N \gg d$ 时，复杂度减小至第一项；当 $N \ll d$ 时，复杂度减小至第二项。  
 
+> 对于具有 small patch sizes 的高分辨率图像，这是这项工作的重点，第一项占上风。这导致了关于序列长度 $N$ 的二次复杂度。因此，删除 the input tokens 的重要部分可以显著节省计算。
 
+> **经验复杂度**  在实践中，观察到的计算成本可能无法准确反映理论预测。有几个因素会使 PatchDropout 的计算节省不如复杂度分析所建议的那样有利。例如，the patchifier，即负责 tokenizing 并将 the input image 投影到一系列 embedded tokens 的层会增加计算开销。分类头也是如此。尽管如此，随着图像大小的增加（因此输入序列长度 $N$ 增加），理论和经验相对计算之间的差距应该会缩小。这需要对节省的计算进行实证分析，以确认理论预测。
 
+> 在图 4 ，我们根据公式(1) (一系列 $L$ 个 transformer blocks 的计算复杂度为：$2LN^2d + 4LNd^2$) 和 经验地根据 FLOPs 的数量，说明了计算的相对下降。当使用两个 keep rates 为0.5和0.25时，我们比较了不同的序列长度 $N$。如上所述， PatchDropout 的计算节省随着 tokens 数量 $N$ 的增加而增加。可以看出，对于 small $N$，计算量的下降与 keep rate 相似，但随着 $N$ 的增加，逐渐收敛到二次节省。虽然理论和经验趋势相似，但由于上面讨论的额外计算，经验节省收敛速度较慢。请注意，$N$ 随图像大小 $H \times W$ 和 patch 大小 $P$ 而变化。多个视觉基准数据集的默认图像大小为 $224 \times 224$。在这种规模下，相对计算量保持在其 keep rate 的值附近——图像不够大，无法从二次节省种获益。然而，许多现实世界的任务需要高分辨率图像，就像在医学领域中通常遇到的那样。在这里，随着序列长度的增加，我们观察到大量的计算节省。
 
+> 最后，需要注意的一个重要因素是， the embedding 维度 $d$ 在不同的 ViT 变体之间是不同的，这会影响它们的计算节省。通常，相比于较大的 ViT，在较小的 ViTs （具有较小的 $d$）上， PatchDropout 的相对计算下降得更快。
 
 
 
+> **Can PatchDropout be used as a regularization method?**
+>
+> （1）PatchDropout 可以用作正则化吗？
+>
+> （2）PatchDropout 是否提供针对信息移除的鲁棒性？
 
+> 为了回答第一个问题，我们进行了实验，将 PatchDropout 视为一种增广方法。详细地说，在每次迭代中，我们统一采样 0.5到1之间的 a keep rate，我们用它来随机选择 image patches 的子集。我们在表7中报告了结果，并得出结论： PatchDropout 是一种有用的增广方法。从某种意义上说，它提供了正则化，即在所有数据集上都提高了泛化能力。这并不完全令人惊讶，因为 PatchDropout 的行为类似于已知的 CNN 正则化方法，如 cutout。
 
 
 
 
 
+# AutoDropout: Learning Dropout Patterns to Regularize Deep Networks_AAAI_2021
 
+## Abstract
 
+> 神经网络通常是过参数化的，因此可以从积极的正则化中获益。传统的正则化方法，例如 **<font color = green>Dropout 或 weight decay，没有利用网络输入和隐藏状态的结构</font>**。因此，这些方法不如最近利用结构的方法有效，例如 SpatialDropout 和 DropBlock，它们随机删除隐藏状态中某些连续区域的值并将它们设置为零。虽然 dropout 区域的位置是随机的，但 **<font color = green>SpatialDropout 和 DropBlock 的模式是人工设计和固定的</font>**。**<font color = purple>本文提出 AutoDropout，它可以自动化设计 dropout 模式的过程。在我们的方法中，控制器学习在目标网络的每个通道和层上生成一个 dropout 模式，如 ConvNet 或 Transformer。然后使用 dropout 模式对目标网络进行训练，并将其产生的验证性能作为控制器学习的信号。</font>** 我们证明该方法适用于 CIFAR-10 和 ImageNet 上的图像识别，以及 Penn Treebank 和 WikiText-2 上的语言建模。学习到的 dropout 模式还可以迁移到不同的任务和数据集，例如从 Penn Treebank 的语言建模到 WMT 2014 的英法翻译。代码地址：https://github.com/googleresearch/google-research/tree/master/auto_dropout  
 
 
 
+## Methods
 
+> **Representing dropout patterns.** **<font color = purple>正如很多先前的工作一样，我们采用逐元素的乘法掩膜（elementwise multiplicative masks）来表示搜索空间中的 dropout 模式。</font>** 为了弥合训练（使用掩码时）和推理（不适用掩码时）之间的差距，我们在训练期间适当地缩放 non-drop neurons 的值。具体来说，为了将 a dropout pattern 应用于神经网络的层 $h$，我们随机生成与 $h$ 相同形状的二进制掩膜 $m$。然后我们缩放掩膜 $m$ 中的值，并将 $h$ 替换为：
+>
+> <img src=AotoDropout_e1.jpg width=50% />
 
+> **Dimensional notations.** 在现代深度学习框架中，中间层被表示为高维张量。我们将张量的一般形状表示为 $(N, d_1, d_2, \dots, d_k, C)$，其中，$N$ 是 the batch dimension，$C$ 是 the feature dimension，$d_1, d_2, \dots, d_k$ 是 the spatiotemporal dimensions。例如,典型的 ConvNet 的层的形状为 $(N, H, W, C)$，其中，$H$ 和 $W$ 是层的高和宽；而 Transformer 层的输出形状为 $(N, T, C)$，其中 $T$ 是表示 tokens 数量的 temporal dimension。
 
+> 我们的方法是通用的，对 spatiotemporal dimensions 彼此不同的 ConvNets 和 Transformers 都很有效。下面，我们将首先讨论 ConvNets 的搜索空间，然后讨论如何将其泛化到 Transformers 上。
 
+> **Search Space for Dropout Patterns in ConvNets**
+>
+> **Basic patterns.** 在我们的搜索空间中，基本模式是一个连续矩形。然后将矩形平铺以产生一个 dropout pattern。对于 ConvNets，定义基本矩形的超参数是高度和宽度两种尺寸。定义平铺的超参数是步幅和重复次数。图2 显示了一个示例。**<font color = purple>对于 $C$ 个通道，我们可以采样 $C$ 个独立的 dropout patterns，也可以仅仅采样一个 dropout pattern 然后沿着特征维度共享它。</font>**
 
+> <img src=AotoDropout_f2.jpg width=50% />
+>
+> 图2：我们搜索空间的基本模式示例。以黑色和灰色表示的 dropout pattern 应用于表示张量的 while cells 的网格。与 gray cells 相对应的神经元得以保留。
 
+> **Where to apply the dropout pattern.** 一旦我们有了 dropout pattern，就需要决定将其应用于何处。**<font color = purple>这里，我们将 the dropout pattern 应用于 the output of batch normalization layers，因为我们根据经验观察到，在网络的其他地方应用 the dropout pattern 通常会导致搜索过程中训练不稳定。</font>** 如果 ConvNets 中存在 **residual** connection 以进行正则化，则可以选择是否也可以将 the dropout pattern 应用于 the residual branch。我们把这个决定留给控制器。
 
 
 
 
 
+# Dynamic ViT: Efficient Vision Transformers with Dynamic Token Sparsification_NIPS_2021
 
+## Abstract
 
+> Vision transformers 的 Attention 是稀疏的。我们观察到，**<font color = green>vision transformers 的最终预测仅基于 a subset of most informative tokens（信息量最大的标记的子集）</font>** ，这足以实现精确的图像识别。基于此观察，**<font color = purple>我们提出一个 dynamic token sparsification framework（动态标记稀疏化框架），根据输入逐步动态地剪枝掉冗余令牌（prune redundant tokens）。</font>** 具体地说，我们设计了一个轻量级的预测模块，**<font color = purple>在给定当前特征的情况下评估 the importance score of each token。</font>** 该模块被添加到不同的层，以分层地修剪冗余 tokens。为了以端到端的方式优化预测模块，本文提出一种 attention masking strategy 通过阻断一个 token 与其它 tokens 的交互来可微分地剪枝。得益于 self-attention 的性质，非结构化稀疏标记（the unstructured sparse tokens）仍然是硬件友好的，这使得框架很容易实现实际的加速。通过分层地剪枝 66% 的 input tokens，该方法大大的减少了 31%-37% 的 FLOPs，并将 throughput 提高了 40% 以上，而各种 vision transformers 的精度下降在 0.5% 以内。相比于 ImageNet 上最先进的 CNNs 和 vision transformers，配备了 dynamic token sparsification framework 的 DynamicVit 模型可以实现非常有竞争力的复杂度/精度权衡。代码地址：https://github.com/raoyongming/DynamicViT
 
 
 
+## 1 Introduction
 
+> 这些年已经证明了 CNN-type 架构的发展给计算机视觉带来了巨大的进步。一些现有的工作开始在许多视觉任务中使用 transformer 来替代 CNN，如目标检测和分类。就像过去几年对 CNN-type 架构所做的一样，我们也希望加速 the transformer-like model，以使它们更适合实时应用。
 
+> 加速 CNN-type 网络的一个常见做法是剪枝掉不那么重要的 filters。The vision transformer 及其变体处理输入的方式，即将输入图像分割成多个独立的 patches，为我们提供了另一种正交的方式来引入加速的稀疏性。也就是说，**<font color = green>我们可以修剪 the input instance 中 less importance 的 tokens，因为很多 tokens 对最终预测的贡献非常小。这仅适用于 the transformer-like 模型，其中 the self-attention 模块可以将可变长度的 token 序列作为输入，非结构化剪枝后的输入不会影响 the self-attention module，而丢弃一部分像素并不能真正加速卷积操作，因为卷积使用的非结构化邻域（unstructured neighborhood）将很难通过并行计算进行加速。</font>** **<font color = purple>由于具有结构化下采样的 CNNs 的分层架构提高了各种视觉任务中的模型效率，本文希望探索 vision transformers 的非结构化和数据依赖的下采样策略（the unstructured and data-dependent downsampling strategy），来进一步利用 self-attention 的优势（实验还表明，相比于 structural downsampling，unstructured sparsification 可以使 vision transformers 的性能更好）。</font>** 我们方法的基本思想如图 1 所示。
 
+> <img src=DynamicViT_f1.jpg width=90% />
+>
+> 图1：主要思想的说明。CNN 模型通常利用结构化下采样策略来构建分层架构，如(a)所示。(b)中 unstructured 和 data-dependent 的下采样方法可以更好地利用输入数据的稀疏性。由于 the self-attention 操作的性质， the unstructured token set 也很容易通过并行计算来加速。（c）利用【Transformer interpretability beyond attention visualization】提出的可视化方法，在 DeiT-S 模型中可视化每个空间位置对最终预测的影响。这些结果表明，**<font color = purple>vision transformers 的最终预测仅基于 a subset of most informative tokens（信息量最大的标记子集），这表明可以在不损害性能的情况下删除很大一部分tokens。</font>**
 
+> 在这项工作中，我们提出采用一个轻量级的预测模块以动态的方式决定要修剪哪些 tokens，称为 DynamicViT。**<font color = green>特别是对于每个 input instance，预测模块产生一个定制的二进制决策掩码（customized binary decision mask），以决定哪些 tokens 是 uninformative 的，需要丢弃。该模块被添加到 the vision transformer 的多个层中，以便可以以分层的方式进行 sparsification（稀疏化），因为我们在每一个预测模块之后逐步增加剪枝的 tokens 数量。一旦 token 在某一层后被剪枝掉，它将永远不会在前馈过程中使用。</font>** 这个轻量级模块引入的额外计算开销非常小，特别是考虑到消除 the uninformative tokens 所节省的计算开销。
+
+> **<font color =green>这个预测模块可以与 the vision transformer backbone 一起以 end-to-end 的方式联合优化。</font>** 为此目的，采用了 **<font color = purple>两项专门的策略</font>** 。**<font color = purple>第一种是采用 Gumbel-Softmax 来克服从分布中采样的不可微问题</font>** ，以便能够进行 the end-to-end 的训练。**<font color = purple>第二种是关于如何应用学习到的二进制决策掩膜（learned binary decision mask）来剪枝不必要的 tokens</font>** 。**<font color = green>考虑到每个 instance 的二进制决策掩膜中零元素的数量不同，在训练过程中消除每个 input instance 的 uninformative tokens 会使并行计算变得不可能。而且，这也会阻碍预测模块的反向传播，因为它需要计算 the token 是否被保留的概率分布，即使它最终被丢弃。此外，直接设置 the abandoned tokens 为零向量也不是一个明智的决定，因为零向量也仍然会影响 the attention matrix 的计算。</font>** 通过这样做，我们能够克服上述困难。我们还修改了 the vision transformer 的原始训练目标，添加了一个术语来约束在某一层之后 pruned tokens 的比例。**<font color = green>在推理阶段，我们可以在每个 input instance 的特定层之后直接丢弃固定数量的 tokens，因为我们不再需要考虑操作是否可微，这将大大加快推理速度。</font>**
+
+> 我们使用 DeiT 和 LV-ViT 作为 backbone 来说明我们的方法在 ImageNet 上的有效性。实验结果表明，该方法在速度和精度之间取得了良好的平衡。特别地，通过分层地剪枝掉 66% 的 the input tokens，对所有不同的 vision transformers，我们可以极大地降低 31%-37% 的 GFLOPs，并且 the throughput 提高 40% 以上而精度的下降在 0.5% 以内。我们的 DynamicViT 证明了利用空间稀疏性来加速 transformer-like models 的可能性。
+
+
+
+## 3 Dynamic Vision Transformers
+
+### 3.1 Overview
+
+> DynamicViT 的总体框架如图 2 所示。DynamicViT 包含了一个普通的 vision transformer 作为backbone 和几个预测模块。主干网络可以实现为广泛的 vision transformer（如 ViT, DeiT, LV-ViT）。预测模块负责生成丢弃/保留 tokens 的概率。The token sparsification 在整个网络的某些位置分层执行。例如，给定一个 12 层的 transformer，我们可以在第4，第7和第10个模块之前进行 token sparsification。**<font color = green>在训练过程中，由于我们新设计的 attention masking strategy，预测模块和骨干网络可以以端到端的方式进行优化。</font>** **<font color = blue>在推理过程中，我们只需要根据预定义的 pruning ratio 和预测模块计算的 scores 选择 the most informative tokens。</font>**
+
+> <img src=DynamicViT_f2.jpg width=90% />
+>
+> 图2：所提出方法的总体框架。所提出的预测模块被插入到 the transformer blocks 之间，以根据前一层产生的特征有选择地修剪信息量较少的标记（less informative token）。通过这样做，在接下来的层中处理的 tokens 就更少。
+
+
+
+### 3.2 Hierarchical Token Sparsification with Prediction Modules
+
+> DynamicViT 的一个重要特征是 the token sparsification 是分层地执行的，即：随着计算的进行，我们逐步地丢弃 the uninformative tokens。为实现这一点，我们用一个 binary decision mask $\hat{D} \in {0,1}^{N}$ 来指示是否要丢弃还是保留每一个 token，其中 $N = HW$ 是 patch embedding 的数量。我们将 the decision mask 中所有的元素初始化为1并逐步更新 the mask。预测模块将当前的 decision $\hat{D}$ 和 the tokens $x \in \mathcal{R}^{N \times C}$ 作为输入。我们首先使用 MLP 投影 the tokens：
+>
+> <img src=DynamicViT_e1.jpg width=60% />
+>
+> 其中 $C'$ 可以是一个更小的尺寸，在我们的使用中我们使用 $C' = C/2$。类似的，我们可以通过下式计算 a global feature：
+>
+> <img src=DynamicViT_e2.jpg width=60% />
+>
+> 其中 Agg 是聚合所有现有 tokens 信息的函数，可以简单实现为 an average pooling：
+>
+> <img src=DynamicViT_e3.jpg width=60% />
+>
+> The local feature 编码了某个 token 的信息，而 the global feature 包含了整个 image 的上下文，因此两者都是 informative 的。因此，我们结合 the local and global feature 来获得 local-global embeddings，并将它们提供给另一个 MLP 来预测 drop/keep the tokens 的概率。
+>
+> <img src=DynamicViT_e4.jpg width=60% />
+>
+> 其中 $\pi_{i,0}$ 表示第 $i$-$th$ 个 token 被 drop 掉的概率，$\pi_{i,1}$ 表示第 $i$-$th$ 个 token 被 keep 的概率。然后我们可以从 $\pi$ 中采样生成 current decision $D$ 并通过下式更新 $\hat{D}$：
+>
+> <img src=DynamicViT_e6.jpg width=60% />
+>
+> 其中 $\odot$ 是 Hadamard product，指示 a token 一旦被 drop，它将不再被使用。
+
+
+
+### 3.3 End-to-end Optimization with Attention Masking
+
+> 虽然我们的目标是要进行 token sparsification，但在训练过程中实现它并非易事。首先，从 $\pi$ 中获取 binary decision mask $D$ 的采样是不可微的，这阻碍了端到端的训练。为了克服这个问题，我们应用 Gumbel-Softmax 技术从概率 $\pi$ 中进行采样：
+>
+> <img src=DynamicViT_e7.jpg width=60% />
+>
+> 其中我们使用索引"1"因为 $D$ 表示 the kept tokens 的 mask。Gumbel-Softmax 的输出是一个 one-hot tensor，其期望正好等于 $\pi$。与此同时，Gumbel-Softmax 具有可微性，使得端到端训练成为可能。
+
+> 第二个阻碍是在训练过程中我们试图修剪 the tokens。The decision mask $\hat{D}$ 通常是非结构化的，而且不同样本的 masks 包含不同数量的1。因此，简单地丢弃 $\hat{D_i} = 0$ 的 tokens 会导致一个批次内的样本的 tokens 数量不一致，这使得并行计算变得困难。因此，我们必须保持 tokens 的数量不变，同时减少剪枝掉的 tokens 和其它 tokens 之间的交互。我们还发现，仅仅使用 the binary mask $\hat{D}$ 将要丢弃的 tokens 归零是不可行的，因为在 self attention 矩阵的计算中，
+>
+> <img src=DynamicViT_e8.jpg width=60% />
+>
+> 归零的 tokens 仍然会通过 Softmax 操作影响其它 tokens。为此，我们设计了一种称为 attention masking 的策略，可以完全消除 the dropped tokens 的影响。具体说来，我们通过以下方式计算 the attention matrix：
+>
+> <img src=DynamicViT_e9.jpg width=60% />
+>
+> 通过公式（10），我们构造了一个 graph，其中 $G_{ij} = 1$ 意味着第 $j$-$th$ 个 token 将为第 $i$-$th$ 个 token 的更新做贡献。请注意，我们显示地为每个 token 添加了一个 self-loop ，以提高数字稳定性。也很容易表明 the self-loop 不会影响结果：如果 $\hat{D_j} = 0$，那么第 $j$-$th$ 个 token 将不会对除了自身以外的任何 tokens 有贡献。公式（11）计算 the masked attention matrix $\tilde{A}$，它等价于仅考虑保留下来的 tokens 来计算的 the attention matrix，但在训练期间具有恒定的 $N \times N$ 形状。
+
+
+
+### 3.4 Training and Inference
+
+> 我们现在描述 DynamicViT 的训练目标。DynamicViT 的训练包括训练预测模块，使其能够产生有利的决策，并对主干进行微调，使其适应 token sparsification。假设我们正在处理一个小批次的 B 样本，我们采用标准的交叉熵损失：
+>
+> <img src=DynamicViT_e12.jpg width=60% />
+>
+> 其中 $y$ 是 DynamicViT (softmax 之后)的预测，$\bar{y}$ 是 the ground truth。
+>
+> 为了最小化由我们的 token sparsification 导致的对性能的影响，我们使用原始的主干网络作为一个 teacher model，并希望我们的 DynamicViT 的行为尽可能地接近 the teacher model。特别地，我们从两个方面考虑这个限制。首先，我们让 DynamicViT 的 the finally remaining tokens 接近 the teacher model，其可以被视为一种 self-distillation：
+>
+> <img src=DynamicViT_e13.jpg width=60% />
+>
+> 其中 $t_i$ 和 $t'_i$ 分别表示 the DynamicViT 和 the teacher model 的最后一个 block 之后的第 $i$-$th$ 个 token。$\hat{D^{b,s}}$ 是在第 $s$-$th$ 个 sparsification stage 的第 $b$-$th$ 个样本的 decision mask。其次，我们通过 KL 散度最小化 DynamicViT 和 它的 teacher 之间的预测差异：
+>
+> <img src=DynamicViT_e14.jpg width=60% />
+>
+> 其中 $y'$ 是 the teacher model 的预测。
+>
+> 最后，我们希望将 the kept tokens 的比率限制为一个预定义的值。给定一组 $S$ 阶段的目标比率 $\rho = [\rho^{(1)}, \dots, \rho^{(S)}]$，我们利用一个 MSE loss 来监督预测模块：
+>
+> <img src=DynamicViT_e15.jpg width=60% />
+>
+> 完整的训练目标是上述目标的结合：
+>
+> <img src=DynamicViT_e16.jpg width=60% />
+>
+> 其中在我们的实验中我们设置 $\lambda_{KL} = 0.5$，$\lambda_{distill} = 0.5$，$\lambda_{ratio} = 2$。
+>
+> 在推理阶段，给定目标比率 $\rho$，我们可以通过预测模块产生的概率直接丢弃 the less informative tokens，使得在 $s$-$th$ 阶段只保留精确的 $m^s = [\rho^{s}N]$ tokens。形式上，对于第 $s$-$th$ 阶段，设
+>
+> <img src=DynamicViT_e17.jpg width=60% />
+>
+> 是按保留概率 $\pi_{*,1}$ 排序的索引，那么我们可以保留索引位于 $\mathcal{L}^{s}_{1:m^s}$ 的 tokens，同时丢弃其它 tokens。通过这种方式，DynamicViT 在运行时动态地剪枝 less informative tokens，从而可以减少推理阶段的计算成本。
+
+
+
+# 正则化 & 剪枝
+
+> Dropout 正则化 和剪枝都属于冗余（redundancy）
+
+## 剪枝
+
+> 1. **<font color = green>剪枝是压缩模型，是要把冗余去掉（直接扔掉冗余的神经元），效果可能变得不好。</font>**
+
+
+
+## 正则化
+
+> 1. **<font color = green>正则化不压缩模型，是要把冗余变得不冗余，把死掉的神经元，通过强制优化的方式（扔掉有用的，只用冗余神经元来训练，强制让冗余变得有用），又让它活起来，协同有用的神经元一起来预测，增加模型鲁棒性，所以效果一定会变好。</font>**
+
+
+
+> 地址：https://blog.csdn.net/weixin_49457347/article/details/117222211
+>
+> **Dropout 和 Pruning 都属于 Redundancy - aware optimization 里模型级别的去冗余工作，dropout 是在 training 过程中只加载一部分神经元，防止过拟合，而 pruning 只是剪枝掉一部分 unimportant 的参数，本身目的并不是为了防止过拟合，又快又简单的压缩才是目的，同时又不掉精度。**
+>
+> **两者的区别在于，在 Dropout 中，每个参数都有可能在训练阶段被丢弃，但在推理阶段会回来。但在剪枝后，参数在剪枝后会被永远丢弃，在训练和推理阶段都不再需要。Dropout 随机地将一些神经元的输出值置为0，这就是一个最简单最没有规律的剪枝思路。**
+
+
+
+
+
+# Patch Slimming for Efficient Vision Transformers_CVPR_2022
+
+## Abstract
+
+> 本文通过挖掘给定网络中的冗余计算，研究了 vision transformers 的效率问题。最近的 transformer 架构已经证明了其在一系列计算机视觉任务中实现卓越性能的有效性。然而，与卷积神经网络相似， vision transformers 巨大的计算开销仍然是一个严峻的问题。**<font color = green>考虑到 attention 机制逐层聚合不同 patches，本文提出一种新的 patch slimming 方法，以自顶向下的范式丢弃 useless patches。</font>** **<font color = purple>首先识别最后一层的有效 patches，然后用它们来指导前一层的 patch 选择过程。</font>** 对于每一层，估计 a patch 对 the final output feature 的影响，并移除影响较小的 patches。在基准数据集上的实验结果表明，所提出的方法可以在不影响 vision transformer 性能的前提下显著降低其计算成本。例如，在 ImageNet 数据集上， ViT-Ti 模型可以减少超过 45% 的 FLOPs，而 top-1 精度只下降 0.2%。
+
+
+
+## 1. Introduction
+
+> 近来，transformer models 已被引入计算机视觉领域，且在很多像目标识别/图像处理/视频分析的任务中取得了高性能。相比于卷积神经网络（CNNs），the transformer 架构引入的归纳偏差更少，因此具有更大的潜能来吸收更多的训练数据，并在更多样化的任务上很好地泛化。然而，与 CNNs 相似，vision transformers 的计算成本也很高，这阻碍了它们在手机和各种物联网设备等资源有限的设备上的部署。为了将深度神经网络应用于此类真实场景，大量的模型压缩算法被提出来降低所需的计算成本。例如，量化算法用低比特数据近似神经网络中的权重和中间特征图（weights and intermediate feature maps）。知识蒸馏通过从巨型模型中迁移知识来提高紧凑网络的性能。
+
+> 此外，网络剪枝被广泛探索，通过直接删除预定义网络中的无用组件来减少神经架构。 Structured pruning 丢弃了预训练模型的整个连续组件，由于无需特定的硬件设计即可实现加速，近年来备受关注。**<font color = green>在 CNNs 中，删除整个 filter 来提高网络效率是一种代表性的范式，称为 channel pruning（or filter pruning）。</font>** 例如， Liu 等人在【Learning efficient convolutional networks through network slimming  】中引入缩放因子来控制神经网络中的 the information flow，具有 small factors 的 filters 将被删除。尽管上述网络压缩方法在部署紧凑卷积神经网络方面做出了巨大努力，但很少有工作讨论如何加速 vision transformers。
+
+> 与传统 CNNs 中的范式不同，**<font color = green>the vision transformer 将 the input image 分割为多个 patches，并且并行计算所有这些 patches 的 features。注意力机制将进一步将所有 patch embeddings 聚合到 visual features 中作为输出。注意力图中的元素反映了任意两个 patches 之间的关系或相似性，构建任意 patch 特征的最大注意力值（the largest attention value for constructing the feature of an arbitrary patch）通常从其自身计算。因此，必须在 the pruned vision transformers 中保留这种信息流（this information flow），以保持模型性能，这在传统的 CNN channel pruning 方法中无法保证。</font>** 此外，并不是所有人工分割的 patches 都具有足够的信息量，值得在所有层中保留，例如有些 patches 和其它 patches 是冗余的。因此，考虑开发一种 patch slimming approach，可以有效识别和删除冗余 patches。
+
+> <img src=PatchSlimming_f1.jpg width=60% />
+
+> 在这篇文章中，我们提出一种新的 patch slimming algorithm 用于加速 the vision transformers。与现有的关注网络通道维度冗余的工作相比，本文旨在探索 a vision transformer 的 the patches 中的计算冗余（如图 1 所示）。所提出的方法以自顶向下的框架从给定的 transformer 架构中删除冗余 patches，以确保能够很好地计算 discriminative patches 保留的高级特征（the retained high-level features of discriminative patches）。**<font color = green>具体来说， the patch pruning 将从最后一层执行到第一层，其中 the useless patches 是通过计算它们对最终分类特征（即 class token）的重要性得分来识别的。</font>** **<font color = blue>为了确保 the information flow，同一空间位置的 patches 被更深层保留，则该 patch 将被保留。对于其它 patches，根据 the importance scores 决定 patches 是否被保留，得分较低的 patches 将被丢弃。</font>** Vision transformers 的整个剪枝方案是在对网络误差的仔细控制下进行的，使得剪枝后的 transformer 网络可以保持原始性能，同时显著降低计算成本。大量的实验验证了所提出方法在部署高效 vision transformers 方面的有效性。例如，我们的方法可以减少 ViT-Ti 模型超过 45% 的 FLOPs，而在 ImageNet 数据集上只有 0.2% 的 top-1 精度损失。
+
+
+
+
+
+## 3. Patch Slimming for Vision Transformer
+
+> 在本节中，我们介绍 vision transformers 中剪枝 patches 的方案。首先简要回顾了 vision transformer，然后介绍了 patch slimming 的构想。
+
+> 在 vision transformer 中，the input image 被分割成 N 个 patches，然后送入 transformer 模型中进行表示学习。对于一个 L 层的 vision transformer model，多头自注意力（MSA）模块和多层感知机（MLP）模块是其主要组成部分，占据了大部分的计算成本。表示 $Z_{l-1},Z^{'}_l \in \mathcal{R}^{N \times d}$ 作为第 $i$-th 层的输入和中间特征，MSA 和 MLP 模块可以表示为：
+>
+> <img src=PatchSlimming_e1.jpg width=60% />
+>
+> 其中 $d$ 是 embedding 维度，$H$ 是 heads 的数量，$Q^h_l = Z_{l-1}W^{hq}_{l}$，$K^h_l = Z_{l-1}W^{hk}_{l}$，$V^h_l = Z_{l-1}W^{hv}_{l}$ 分别为第 $l$-th 层第 $h$-th 个 head 的 query, key 和 value。$W^{a}_{l}$ 和 W^{b}_{l} 是用于线性变换的权重，$\Phi(.)$ 是非线性激活函数（例如 GeLU）。近来大多数 vision transformer 模型是通过交替堆叠 MSA 和 MLP 模块来构建的，a block $\mathcal{B}_l(.)$ 被定义为 $\mathcal{B}_l(Z_{l-1}) = MLP(MSA(Z_{l-1}) + Z_{l-1}) + Z^{'}_l$ 。
+
+> 如前所述， vision transformers 的 patch level 存在大量冗余信息。为了进一步验证这一现象，我们计算了一个 layer 内 patches 之间的平均余弦相似度，并在图 3 中显示了相似度随着 layers 的变化情况。随着 layers 的增加，patches 之间的相似度快速增加，在较深层的 patches 之间的平均相似度甚至超过 0.8。高相似度意味着 patches 是冗余的，尤其是在较深的层，移除它们将不会明显影响特征计算（the feature calculation）。
+
+> **<font color = purple>Patch slimming 旨在识别并丢弃冗余 patches，以加速推理过程（如图 1 所示）。</font>** 这里我们使用一个二进制向量 $m_l \in {0,1}^N$ 来指示 a patch 是否被保留。剪枝后的 MSA 和 MLP 模块可表述为：
+>
+> <img src=PatchSlimming_e2.jpg width=60% />
+>
+> 
+
+
+
+## 4.2. Impact Estimation
+
+> 使用上一节中描述的 patch 剪枝方案，剩下的就是在 vision transformer 中识别冗余 patches，即在每一层中找到最佳 mask $m_l$。我们的目标是在保持 the output feature 的表示能力的同时，尽可能多地剪枝掉 patches 以实现最大的加速度。
+
+
+
+
+
+
+
+# Not All Images are Worth 16 $\times$ 16 Words: Dynamic Transformers for Efficient Image Recognition_NeurIP_2021
+
+## Abstract
+
+> Vision Transformers(ViT) 在大规模图像识别中取得了显著的成功（remarkable success）。**<font color = green>他们将每一个 2D image 分成固定数量的 patches，每个 patch 被视为一个 token。</font>** 通常，用更多的 tokens 表示 an image 将会导致更高的预测精度，同时它也会导致计算成本大幅增加。为了在精度和速度之间取得不错的平衡， tokens 的数量根据经验设置为 16 $\times$ 16 或 14 $\times$ 14。本文认为，每个图像都有自己的特征，理想情况下，tokens 的数量应该以每个单独的输入为条件。事实上，我们观察到存在大量的“简单”图像，仅用 4 $\times$ 4 的 tokens  就可以准确地预测，而只有一小部分“困难”图像需要一个更精细的表示。受到这个现象的启发，**<font color = purple>本文提出 Dynamic Transformer，为每个 input image 自动配置适当数量的 tokens。这是通过级联具有越来越多 tokens 的多个 Transformers 来实现的，这些 tokens 在测试阶段以自适应的方式被顺序激活，即一旦产生足够自信的预测，推理就会终止。</font>** 在 Dynamic Transformer 的不同组件之间进一步设计了高效的特征重用和关系重用机制 **<font color = purple>（efficient feature reuse and relationship reuse mechanisms）</font>**，以减少冗余计算。在 ImageNet, CIFAR-10 和 CIFAR-100 上的广泛经验结果表明，所提出的方法在理论计算效率和实际推理速度方面明显优于有竞争力的基线。Code and pre-trained models(based on PyTorch and MindSpore) are available at https://github.com/blackfeather-wang/Dynamic-Vision-Transformer and https://github.com/blackfeather-wang/Dynamic-Vision-Transformer-MindSpore 。
+
+
+
+
+
+# DeiT, Training data-efficient image transformers & distillation through attention_2021
+
+## Abstract
+
+> 近来，纯基于 attention 的神经网络被证明可以解决图像理解任务，如图像分类。这些高性能 vision transformers 使用大型基础设备用数亿张图像进行预训练，从而限制了它们的采用。
+
+> 在这项工作中，**<font color = purple>我们仅通过在 ImageNet 上进行训练来生产具有竞争力的无卷积 transformers（competitive convolution-free transformers）。我们用一台计算机在不到 3 天的时间里训练它们。</font>** 所提出的 reference vision transformer(86M 参数) 在没有额外数据的情况下，在 ImageNet 上实现了 83.1%（singlecrop）的 top-1 精度。
+
+> 更重要的是，**<font color = purple>我们引入了一种针对 transformers 的 teacher-student strategy。它依赖于一个 distillation token 确保 student 通过 attention 从 teacher 那里学习。</font>** 我们展示了这种 token-based distillation 的兴趣，特别是当使用卷积神经网络作为 teacher 的时候。这导致我们在 ImageNet（我们获得高达 85.2% 的准确率）和迁移到其他任务上时报告的结果与卷积神经网络具有竞争力。
+
+
+
+## Introduction
+
+> **<font color = purple>在本文中，我们用2到3天（53个小时的预训练，可选的20个小时的微调）在单个 8-GPU node 上训练一个 vision transformer，这与具有相似数量参数和效率的卷积神经网络具有竞争力。</font>** **<font color = green>它使用 Imagenet 作为唯一的训练集。我们在 Dosovitskiy 等人的 vision transformer 架构和 timm 库中的改进基础上进行构建。</font>** 使用我们的 Data-efficient image Transformers(DeiT)，我们报告了比以前的结果有很大改进，见图1。我们的消融研究详细描述了超参数和成功训练的关键成分，如 repeated augmentation。
+
+> 我们解决了另一个问题：如何提取（distill）这些模型？本文提出一种 **token-based strategy**，特定于 transformers，用 DeiT⚗ 表示，并表明它有利地取代了通常的蒸馏（usual distillation）。
+
+> 综上所述，我们的工作有以下几点贡献：
+>
+> * 我们表明，我们的不包含卷积层的神经网络可以在没有外部数据的情况下在 ImageNet 上实现与现有最先进的技术相比具有竞争力的结果。**<font color = purple>它们在三天内在具有4 个GPU 的单个节点上学习（我们可以通过在两天内在8个gpu上训练它来加速更大模型DeiT-B的学习）。</font>** 我们的两个新模型 DeiT-S 和 DeiT-Ti 有更少的参数，可以看作是 ResNet-50 和 ResNet-18 的对应物。
+> * **<font color = green>我们引入了一种新的基于 a distillation token 的 distillation procedure（蒸馏过程）,它与 class token 的作用相同，只是它旨在重现教师估计的标签。</font>** 两个 tokens 都通过 attention 在 transformer 中交互。这种 transformer-specific strategy 大大优于 vanilla distillation。
+> * 有趣的是，通过我们的 distillation， image transformers 从卷积神经网络中学到的东西比从另一个具有类似性能的 transformer 学到的东西多。
+> * 在 Imagenet 上与学习的模型当迁移到不同的下游任务时，如细粒度分类，在几个流行的公共基准（CIFAR-10, CIFAR-100, Oxford-102 flowers,Stanford Cars 和 iNaturalist-18/19）上是有竞争力的。
+
+
+
+### blog：https://blog.csdn.net/LF_AI/article/details/125195597
+
+> **<font color = green>Data-efficient image Transformers(DeiT)，是一种新的高效图像分类算法，用 Transformer 替代卷积，只需要较少的数据和算力就可以在 ImageNet 数据集上达到与顶尖的卷积网络（CNN）媲美的 图像分类结果 。</font>**
+
+> **<font color = purple>ViT 在大数据集（JFT-300M）上的表现可以达到或超越当前的 SOTA 水平，但在小数据集上表现不理想，限制了其应用范围。DeiT 的网络结构跟 ViT 基本一致，主要区别在于添加了一个蒸馏 token 以及训练策略不同。</font>**
+
+> <img src=DeiT_f2.jpg width=40% />
+>
+> 如上图，在 ViT 架构基础上引入的 **<font color = blue>蒸馏 token</font>** ，参与了整体信息的交互过程（在 self-attention layer 中与 class token 和 patch token 不断交互）。**<font color = blue>蒸馏 token 的地位与 class token 相同，唯一的区别在于，class token 的目标是跟真实的 label 一致，而蒸馏 token 是要跟 teacher 模型预测的 label 一致。</font>** 蒸馏分为两种，一种是软蒸馏（soft distillation），一种是硬蒸馏（hard-label distillation）。
+>
+> 软蒸馏以交叉熵为分类损失，KL 散度为蒸馏损失，用教师网络的 softmax 输出为标签，也即是常规蒸馏方式：
+>
+> <img src=DeiT_e1.jpg width=60% />
+>
+> 硬蒸馏以交叉熵为蒸馏损失，以教师网络的硬输出为标签：
+>
+> <img src=DeiT_e2.jpg width=60% />
+>
+> 蒸馏 token 见上图模型结构，在输入 embedding 处添加一个蒸馏 token，蒸馏 token 的使用与 class token 类似，它通过 self-attention 与其它 embedding 交互。通过训练迭代后，二者的余弦相似性会逐渐增大（但始终小于1），这也表明蒸馏 embedding 允许我们从 teacher 的输出中学习，同时与 class embedding 保持互补。
+>
+> **联合分类器** 经过测试发现，class token 和 蒸馏 token 是朝着不同的方向收敛的，对各个 layer 的这两个 token 计算余弦相似度，平均值只有 0.06，但是其余弦相似度随着网络输出会越来越大，在最后一层达到 0.93。那么在测试时我们将分别拥有两个 token 的输出向量，考虑把二者的 softmax 输出相加，进行预测。
+
+
+
+> **DeiT：Data-efficient image Transformers，是一种高效的图像分类算法，优势是只需要较少的数据和计算开销就可以达到与顶尖CNN 的图像分类结果。它的网络架构与ViT 基本一致，主要区别是训练策略不同，而且<font color = green>增加了一个 蒸馏 token</font>，这个蒸馏token 与 class token 作用相同，唯一的区别是，class token 的目标是跟真实的 label一致，而蒸馏 token 是要跟 teacher 模型预测的label 一致。。
+> DeiT需要用2-3天在单个 8-GPU 节点上训练。** 
+>
+> **DeiT 有三种变体模型：DeiT-Ti, DeiT-S, DeiT-B。**
+>
+> <img src=DeiT_t1.jpg width=80% />
+
+
+
+
+
+
+
+# LV-ViT, All Tokens Matter: Token Labeling for Training Better Vision Transformers_NeurlPS_2021
+
+> **<font color = green>以往的 Vision Transformer 分类任务都只是应用 class token 聚集全局信息，用于最后的分类。作者提出将 patch token 也用作 loss 的计算。相当于将一张图像的分类问题，转换成了每个 token 的识别问题，每个 token 的分类标签是由机器生成的监督。</font>**
+
+> **<font color = blue>常规的 ViT 将图像分割成 patch，再加入一个 class token，经过多轮相似度计算后，将图像信息聚合到 class token 中，最后只采用图像级标签（image-level label）作为监督，而忽略了嵌入在每个 image patch 中的丰富信息。作者提出一种新的训练目标—— token labeling——该标记利用了 patch token 和 class token 之间的互补信息。</font>**
+>
+> <img src=LV-ViT_f1.jpg width=120% />
+>
+> Token Labeling 强调所有输出 token 的重要性，并主张每个输出 token 应与单个位置特定的标签相关联。
+>
+> 
+
+
+
+## Abstract
+
+> 在本文中，提出了一个新的训练目标，即 Token Labeling，用于训练高性能 Vision Transformer(ViT)。**<font color = purple>ViTs 的标准训练目标是在一个额外的可训练 class token 上计算分类损失，所提出方法的训练目标是利用 all the image patch tokens 以密集的方式计算训练损失。</font>** 也就是说 **<font color = purple>将图像分类问题重新描述为多个token 级别的识别问题</font>** ，并为每个 patch token 分配由机器注释器生成的特定于位置的单独监督 supervision。
+
+
+
+
+
+
+
+
+
+# Swin Transformer: Hierarchical Vision Transformer using Shifted Windows_2021
+
+## Abstract
+
+> **<font color = green>Transformer 应用到 CV 领域的挑战：</font>**
+>
+> * **<font color = green>视觉实体的尺度区别很大</font>**，例如车辆和人，而 NLP 对象的大小是标准固定的；
+> * 相对于文本中的单词，**<font color = green>图像像素的分辨率太高，而 CV 中使用 Transformer 的计算复杂度是图像尺度的平方，这会导致计算量过于庞大</font>**
+
+> **<font color = green>解决办法：使用层级式的 transformer（a hierarchical transformer），使用移动窗口（滑窗）</font>**
+>
+> **<font color = blue>好处：</font>**
+>
+> * 通过将注意力计算限制到不重叠的局部窗口，同时还允许跨窗口连接，带来了，提高了效率（**滑窗操作包括不重叠的 local window，和重叠的 cross-window**）；
+> * 通过移动，使得相邻两个窗口之间有了交互，上下层之间也就有了跨窗口连接，从而变相达到了一种全局建模的效果；
+> * 层级式的结构不仅非常灵活的去建模各个尺度的信息，并且计算复杂度随图像大小线性增长。
+
+
+
+> **总结：**
+>
+> Swin Transformer 是一种层级式的 transformer，与 Vision Transformer 只产生单一分辨率的特征图，且patch 数量不会随网络深度的加深而变化不同， Swin Transformer 采用了滑动窗口的方式，通过合并更深层的图像块来构建分层特征图，使 patch 数量随着网络深度的加深而减少，进一步使得每个 patch 的感知范围扩大，从而能够适应视觉任务的多尺度。此外，Vision Transformer 是计算全局的 self-attention，对于输入图像大小具有二次计算复杂度。而 Swin Transformer 只在每个局部窗口内计算注意力，因此对于输入图像大小具有线性计算复杂度。也就是说，同样是作为图像分类任务的 backbone，Swin Transformer 相比 Vision Transformer 不仅能够解决视觉任务的多尺度问题，而且计算复杂度大大降低。
+
+
+
+
+
+# ConvNeXt,A ConvNet for the 2020s_2022
+
+> 原始的 ViT 架构，在通用的计算机视觉任务如目标检测和语义分割等任务上面临不少困难。直到具有分层架构的 Transformer 如 Swin Transformer 的出现，通过重新引入 ConvNet 的一些设计，它作为一种通用的视觉 backbone 并在多个视觉任务上取得优良的表现，才让 Transformer 变得实用。但是这种混合架构的有效性，很大程度上归功于 Transformer 的内在优势，而不是卷积固有的归纳偏差（inductive biases）。**<font color = green>这篇文章重新审视设计的空间，并测试一个纯 CNN 网络能取得什么样的上限。</font>** **<font color = purple>作者通过逐渐将一个标准 ResNet 模型，不断往 ViT 的设计中改造，并发现了几个关键的成分导致了性能的差异。</font>** 作者构造的纯 ConvNet 系列模型，能够取得超过 Swin Transformer 的性能，在 ImageNet-1K 上取得了超过 87.8% 的 Top-1 精度。
+
+
+
+> 普通的 ViT 模型在被用作通用视觉主干时面临许多挑战。最大的挑战是 ViT 的全局注意力设计，它相对于输入尺度大小具有二次方复杂度。这对于 ImageNet 分类可能是接受的，但难以处理高分辨率的输入。
+
+
+
+> ConvNets 与分层 ViT 同时具有相似性与差异性：它们都具备了相似的归纳偏置，但在训练过程中和宏观/微观层面的架构设计上存在显著差异。在这篇文中，作者研究了 ConvNets 和 Transformer 之间的架构区别，并在比较网络性能时尝试定位混在因子。作者的研究旨在弥合 ConvNet 在 ViT 出现前后的差距，并测试纯 ConvNet 所能达到的极限。
+
+> 为此，作者从标准的 ResNet 开始，进行一种渐进式的改进过程。**<font color = green>作者逐渐将架构“现代化”，朝着分层 Transformer 如 Swin Transformer 去构建。该探索由一个关键问题引导：Transformer 中的设计决策如何影响 ConvNet 的性能？作者发现了几个关键组件导致了该性能的差异。</font>** 在 COCO 目标检测与分割，ADE20K 语义分割等任务上评估，令人惊讶的是，完全由标准 ConvNet 模块构建的 ConvNeXt，具有相当竞争力。作者希望这些新的观察与讨论能够挑战一些共同的观念，并鼓励人们重新思考 CNN 在计算视觉中的重要性。
+
+> 作者提供了 ResNet 到类似于 Transformer 的 ConvNet 的轨迹。作者根据 FLOP 考虑两种模型大小，一种是 ResNet50，Swin-Tiny 体，其 FLOPs 约为 4.5G；另一种是 ResNet200，Swin-Base 体，其 FLOPs 为 15.0G。
+
+> <img src=ConvNeXt_f1.jpg width=80% />
+>
+> 路线图如上图所示，作者开始的起点是 ResNet50 模型。作者首先使用训练 Vision Transformer 的类似训练技术对其进行训练，并获得比原始 ResNet-50 有很大改进的结果，这将是作者的基线工作。然后，作者设计了一系列设计决策，总结为：
+>
+> * 宏观设计
+> * ResNeXt
+> * 倒置的 BottleNeck
+> * 大卷积核
+> * 各种层的微观设计
+
+
+
+## 训练技巧
+
+> 除了网络架构的设计，训练过程也会影响最终性能。ViT 不仅带来了一组新的模块和架构设计决策，而且还为视觉引入了不同的训练技巧，如 AdamW 优化器。这主要与优化策略相关的超参设置有关。因此，**<font color = green>作者探索的第一步就是使用 Vision Transformer 的训练过程来训练基线模型，如 ResNet50/200。</font>** 作者使用了接近 Deit 和 Swin Transformer 相近的训练方法，显著提升了 ResNet50的性能（从 76.1% 到 78.8%），**<font color = green>这意味着传统 ConvNet 和 Transformer 之间的很大一部分性能差异可能来自训练技巧。</font>**
+
+
+
+## 宏观设计
+
+> 作者先从 Swin Transformer 的宏观设计开始分析。**<font color = green>Swin Transformer 遵循 ConvNet 使用多阶段设计，其中每个阶段具有不同的分辨率。</font>**
+>
+> 有两个设计因素考虑：阶段计算比例，“主干细胞（stem cell）”结构。
+>
+> （1）**<font color = green>改变阶段计算比例</font>** --> Swin Transformer 的阶段计算比例为 1：1：3：1，**<font color = green>作者将每个阶段的块数从 ResNet50 中的 3:4:6:3调整为 3:3:9:3</font>** ，使得模型准确率从 78.8%提升到79.4%。
+>
+> （2）**<font color = blue>将主干 Patchify</font>** --> 标准 ResNet 模型中的 stem cell 包含一个 $7 \times 7$ 步长为2的卷积层，然后跟一个最大池化层，导致输入图像的4倍下采样。Swin Transformer 采用类似的 patchify 层，但使用了更小的 $4 \times 4$ 的 patch size 来适应架构的多阶段设计。**<font color = blue>作者在网络中采用“patchify stem”（$4 \times 4$ ，步长为4的卷积层）</font>** ，准确率从 79.4% 提升到 79.5%。
+
+
+
+## ResNeXt-ify
+
+> 该部分作者尝试采用 ResNeXt 的思想（ResNeXt 的指导原则使“使用更多的组，扩大宽度”），**<font color = green>按照 ResNeXt 提到的策略，作者将网络宽度增加到 Swin-Tiny Transformer 相同的通道数（从 64 到 96），FLOPs 增加到 5.3G，识别率也达到了 80.5%。</font>**
+
+
+
+## 倒置 BottleNeck
+
+> **<font color = blue>每个 Transformer 块的重要设计是它创造了一个倒置的 BottleNeck，即 MLP 的隐藏维度是输入维度的四倍。有趣的是，Transformer 这种设计与 ConvNets 中使用的扩展比为 4 的倒置 BottleNeck 设计有关联。</font>**
+>
+> <img src=ConvNeXt_f2.jpg width=80% />
+>
+> 图2：模块修改和对应的规格。(a) ResNeXt 的一个块；(b) 作者创建的反转维度后的 BottleNeck 块；(c) 将 DW-CNN 层上移后的模块。
+>
+> 作者探索了倒置 BottleNeck 的设计。网络的 FLOPs 减少到 4.6G，精度从 80.5 提升到 80.6，在 ResNet200 和 Swin-Base 中，这一步获得了更大的收益，精度从 81.9 增加到 82.6，运算量反而降低。
+
+
+
+## 大核的尺寸
+
+> **<font color = green>该部分作者关注大卷积核的行为。ViT 最显著的方面之一是它们的非局部注意力，它使每一层都有全局感受野。尽管 Swin Transformer将局部窗口重新引入自注意力模块中，但窗口大小至少为 $7 \times 7$，明显大于 $3 \times 3$ 的 ResNe(X)t 等。</font>**
+>
+> （1）**上移 DW-CNN 层** --> **<font color = green>为了探索大内核，一个先决条件是向上移动 DW-CNN 的位置，图2(c)。</font>** 这在 ViT 设计中也很明显：MSA 模块放置在 MLP 层前。这是一个自然的设计选择：即复杂而低效率的模块（如 MSA，大内核）具有更少的通道，而高效率的 $1 \times 1$ 将完成繁重的工作。这个中间步骤将 FLOPs 降低到 4.1G，性能也暂时下降至 79.9%。
+>
+> （2）**<font color = green>扩大卷积核尺寸</font>** --> 作者尝试了包括 3,5,7,9,11 的内核大小，网络性能从 79.9%（$3 \times 3$）增加到 80.6%（$7 \time 7$），而 FLOPs 大致保持不变，且 **<font color = green>大核的好处在 $7 \times 7$ 处达到饱和</font>**。因此作者采用核大小为 7 的卷积核。
+
+
+
+## 微观设计
+
+> <img src=ConvNeXt_f3.jpg width=80% />
+>
+> （1）使用 GELU 替代 ReLU
+>
+> （2）使用更少的激活函数
+>
+> （3）使用更少的归一化层
+>
+> （4）使用 LN（Layer Norm） 替代 BN（Batch Norm）
+>
+> （5）使用单独的下采样层 --> 作者使用 $2 \times 2$ ，步长为 2 的卷积进行空间下采样。
 
 
 
