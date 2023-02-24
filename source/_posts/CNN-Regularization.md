@@ -1523,7 +1523,7 @@ tags: CNN Regularization
 
 
 
-
+hhh
 
 # Dynamic ViT: Efficient Vision Transformers with Dynamic Token Sparsification_NIPS_2021
 
