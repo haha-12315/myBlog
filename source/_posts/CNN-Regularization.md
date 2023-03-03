@@ -1943,12 +1943,18 @@ tags: CNN Regularization
 
 
 
+# Revisiting Structured Dropout
+
+## Abstract
+> 大型神经网络经常过度参数化，容易过拟合，Dropout 是一种广泛使用的正则化技术，用于对抗过拟合和提升模型性能。然而，非结构化Dropout 并不总是对特定的网络架构有效，这导致了多种结构Dropout 方法的形成，以提高模型性能，有时还减少推理所需的计算资源。在这项工作中，我们重新审视结构Dropout，比较不同的Dropout方法在自然语言处理和计算机视觉任务的多个最先进网络。此外，我们设计了一种结构化Dropout方法，我们称之为 **ProbDropBlock**，它从 feature maps 中丢弃连续块，其概率由标准化的特征显著值给出。我们发现，通过一个简单的调度策略，与基线和其他Dropout方法相比，所提出的结构Dropout方法在不同范围的任务和模型上一致地提高了模型性能。特别地，我们展示 ProbDropBlock 将 MNIST 上的 RoBERTa 微调提高了0.22%，并将 ResNet50 在 ImageNet 上的训练提高了0.28%。
 
 
+## Method
+> 本节详细介绍了所提出的结构dropout方法。我们的方法是一种自适应DropBlock形式，我们称之为**ProbDropBlock**，它是受DropBlock的启发，因为它也从每一个feature map中移除更大的块（larger blocks），但不是为每个元素分配一个统一的概率作为 block 的中心点，而是分配更高的概率给具有更高激活值的元素。
 
+> 因此，移除的block取决于模型对feature map的学习表示，我们相信这将鼓励模型学习更加平衡和多样化的feature map。我们还采用了一个简单的线性计划，即线性增加丢弃block的基本概率$\alpha$。Ghiasi等人在他们的论文中观察到，这种方法能显著提高性能，并且更加鲁棒。
 
-
-
+> <img src= ProbDropBlock.png width=80% />
 
 
 
