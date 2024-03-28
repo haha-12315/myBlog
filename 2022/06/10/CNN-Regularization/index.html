@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://haha-12315.github.io/myBlog/2022/06/10/CNN-Regularization/ProbDropBlock.png">
 <meta property="og:image" content="https://haha-12315.github.io/myBlog/2022/06/10/CNN-Regularization/ComprehensiveSurveyOnRegularization_f1.png">
 <meta property="article:published_time" content="2022-06-10T07:55:36.000Z">
-<meta property="article:modified_time" content="2024-03-27T09:07:30.734Z">
+<meta property="article:modified_time" content="2024-03-28T08:35:55.349Z">
 <meta property="article:author" content="Haha">
 <meta property="article:tag" content="CNN Regularization">
 <meta name="twitter:card" content="summary">
@@ -318,7 +318,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2024-03-27 17:07:30" itemprop="dateModified" datetime="2024-03-27T17:07:30+08:00">2024-03-27</time>
+      <time title="Modified: 2024-03-28 16:35:55" itemprop="dateModified" datetime="2024-03-28T16:35:55+08:00">2024-03-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -2321,6 +2321,70 @@ transformer 模型被鼓励在重建被掩盖的语音帧时使用全局信息�
 <strong><font color="green">文章以 BERT-base 模型为例，探讨了注意力冗余的定义、测量方法、存在的位置、
 发生的事件、相关任务以及产生原因，并提出了一种基于注意力冗余的模型压缩策略：</font>
 <font color="purple">零样本剪枝方法</font></strong></p>
+</blockquote>
+<blockquote>
+<p><strong><font color="purple">零样本剪枝方法</font>操作步骤：</strong></p>
+</blockquote>
+<blockquote>
+<ol>
+<li><strong><font color="purple">生成注意力冗余矩阵</font></strong></li>
+</ol>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 使用预训练的 BERT-base模型处理输入数据（可以是随机生成的 token 序列）；</p>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 对于每个输入句子，提取12层的12个注意力头产生的注意力矩阵；</p>
+</blockquote>
+<blockquote>
+<p><strong><font color="green"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 计算所有注意力矩阵之间的成对距离，
+形成 144 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>×</mo></mrow><annotation encoding="application/x-tex">\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">×</span></span></span></span> 144 的注意力冗余矩阵。</font></strong></p>
+</blockquote>
+<blockquote>
+<ol start="2">
+<li><strong><font color="purple">聚类注意力头</font></strong></li>
+</ol>
+</blockquote>
+<blockquote>
+<p><strong><font color="green"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 应用聚类算法（例如谱聚类）对注意力头进行聚类；</font></strong></p>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 聚类的目标是将相似的注意力头分为同一组，以便识别出冗余的头并进行剪枝；</p>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 如果给定了一个剪枝比例p，那么聚类的数量将设置为 144 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>×</mo></mrow><annotation encoding="application/x-tex">\times</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord">×</span></span></span></span> (1-p)。</p>
+</blockquote>
+<blockquote>
+<ol start="3">
+<li><strong><font color="purple">选择保留的注意力头</font></strong></li>
+</ol>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 使用**<font color="green">聚类质量指标（如轮廓系数）来评估每个聚类中心的质量；</font>**</p>
+</blockquote>
+<blockquote>
+<p><strong><font color="blue"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 每个聚类中的最能代表该类的代表头在剪枝过程中被保留。</font></strong></p>
+</blockquote>
+<blockquote>
+<ol start="4">
+<li><strong><font color="purple">执行剪枝</font></strong></li>
+</ol>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 移除未被选为聚类代表的注意力头的可训练参数；</p>
+</blockquote>
+<blockquote>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>⋆</mo></mrow><annotation encoding="application/x-tex">\star</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.46528em;vertical-align:0em;"></span><span class="mord">⋆</span></span></span></span> 相应地剪掉前馈网络中与这些注意力头相关的参数。</p>
+</blockquote>
+<blockquote>
+<ol start="5">
+<li><strong><font color="purple">微调模型</font></strong></li>
+</ol>
+</blockquote>
+<blockquote>
+<ol start="6">
+<li><strong><font color="purple">评估性能</font></strong></li>
+</ol>
 </blockquote>
 </font></font></body></html>
     </div>
